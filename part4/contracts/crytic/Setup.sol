@@ -4,6 +4,7 @@ import "../UniswapV2Pair.sol";
 import "../UniswapV2ERC20.sol";
 import "../UniswapV2Factory.sol";
 import "../libraries/UniswapV2Library.sol";
+import "../UniswapV2Router01.sol";
 
 contract Users {
   function proxy(address target, bytes memory _calldata)
@@ -20,6 +21,7 @@ contract Setup {
     UniswapV2ERC20 testToken2;
     UniswapV2Pair testPair;
     UniswapV2Factory factory;
+    UniswapV2Router01 router;
     Users[] users;
     bool liquidityProvided;
 
@@ -27,8 +29,9 @@ contract Setup {
         testToken1 = new UniswapV2ERC20();
         testToken2 = new UniswapV2ERC20();
         factory = new UniswapV2Factory(address(this)); //this contract will receive fees
-        address pair = factory.createPair(address(testToken1), address(testToken2));
-        testPair = UniswapV2Pair(pair);
+        router = new UniswapV2Router01(address(factory),address(0)); // we don't need to test WETH pairs for now
+        //address pair = factory.createPair(address(testToken1), address(testToken2));
+        //testPair = UniswapV2Pair(pair);
         _createUsers();
         _mintTokens();
 
@@ -46,12 +49,9 @@ contract Setup {
             
         
     }
-
+    
     function _provideInitialLiquidity() internal {
-        (bool success1, ) = users[0].proxy(address(testToken1), abi.encodeWithSelector(testToken1.transfer.selector, address(pair), 100000e18));
-        (bool success2, ) = users[0].proxy(address(testToken2), abi.encodeWithSelector(testToken2.transfer.selector, address(pair), 100000e18));
-        require (success1 && success2);
-        testPair.mint(users[0]);
+        router.addLiquidity(address(testToken1), address(testToken2), 100000e18, 100000e18, 0, 0, address(user[0]), block.timestamp);
         liquidityProvided = true;
     }
      function _between(

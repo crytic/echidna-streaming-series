@@ -1,4 +1,4 @@
-pragma solidity >=0.5.16;
+pragma solidity ^0.6.0;
 
 import "../UniswapV2Pair.sol";
 import "../UniswapV2ERC20.sol";
@@ -23,9 +23,7 @@ contract Setup {
     UniswapV2Factory factory;
     UniswapV2Router01 router;
     Users[] users;
-    bool liquidityProvided;
-
-    constructor() {
+    constructor() public {
         testToken1 = new UniswapV2ERC20();
         testToken2 = new UniswapV2ERC20();
         factory = new UniswapV2Factory(address(this)); //this contract will receive fees
@@ -34,6 +32,7 @@ contract Setup {
         //testPair = UniswapV2Pair(pair);
         _createUsers();
         _mintTokens();
+        _doApprovals();
 
     }
     function _createUsers() internal {
@@ -49,11 +48,15 @@ contract Setup {
             
         
     }
-    
-    function _provideInitialLiquidity() internal {
-        router.addLiquidity(address(testToken1), address(testToken2), 100000e18, 100000e18, 0, 0, address(user[0]), block.timestamp);
-        liquidityProvided = true;
+    function _doApprovals() internal {
+      for(uint i; i < 2; ++i) {
+           users[i].proxy(address(testToken1),abi.encodeWithSelector(testToken1.approve.selector,address(router), uint(-1)));
+           users[i].proxy(address(testToken2),abi.encodeWithSelector(testToken2.approve.selector,address(router), uint(-1)));
+           
+        }
     }
+    
+    
      function _between(
     uint256 val,
     uint256 lower,

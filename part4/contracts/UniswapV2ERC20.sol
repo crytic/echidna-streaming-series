@@ -1,9 +1,9 @@
-pragma solidity =0.5.16;
+pragma solidity ^0.6.0;
 
 import './interfaces/IUniswapV2ERC20.sol';
 import './libraries/SafeMath.sol';
 
-contract UniswapV2ERC20 is IUniswapV2ERC20 {
+contract UniswapV2ERC20 {
     using SafeMath for uint;
 
     string public constant name = 'Uniswap V2';
@@ -24,8 +24,8 @@ contract UniswapV2ERC20 is IUniswapV2ERC20 {
     constructor() public {
         uint chainId;
         assembly {
-            chainId := chainid
-        }
+            chainId := chainid()
+        } 
         DOMAIN_SEPARATOR = keccak256(
             abi.encode(
                 keccak256('EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)'),
@@ -65,7 +65,7 @@ contract UniswapV2ERC20 is IUniswapV2ERC20 {
         return true;
     }
 
-    function transfer(address to, uint value) external returns (bool) {
+    function transfer(address to, uint value) external virtual returns (bool) {
         _transfer(msg.sender, to, value);
         return true;
     }

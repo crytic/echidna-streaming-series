@@ -1,0 +1,2 @@
+# Can set testMode to property or assertion mode depending on how you want to test the system's properties
+testMode: assertion

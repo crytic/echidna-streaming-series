@@ -1,0 +1,16 @@
+# Part 2: Fuzzing arithmetics and functions
+
+## Sections
+
+Welcome to Part 2 of the Echidna streaming series. This part has two sections:
+
+- [ABDKMath](./abdk/Template.sol): The ABDKMath section highlights how to write simple function-level properties for arithmetic operations.
+- [Staker](./staker/contracts/Template.sol): The Staker section highlights the use of an external testing methodology to test a target system. Additionally, it highlights how to use coverage reports to debug your fuzz tests.
+
+## Slides
+
+The slides for this part can be found [here](TODO).
+
+## Video Presentation
+
+The video presentation for this part can be found on [YouTube](TODO).

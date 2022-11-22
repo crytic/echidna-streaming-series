@@ -248,19 +248,43 @@ contract EchidnaTemplate {
     Start of tests
     ================================================================ */
 
+    // Test for associative property
+    // (x + y) + z == x + (y + z)
+    function add_test_associative(int128 x, int128 y, int128 z) public {
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+    // Test (x + y) - y == x
+    function add_sub_inverse_operations(int128 x, int128 y) public {
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     // Test that division is not commutative
     // (x / y) != (y / x)
     function div_test_not_commutative(int128 x, int128 y) public {
-        // Pre-condition
-        // require(abs(x) != abs(y));
-        // optimization
-        if (abs(x) == abs(y)) {
-            y = x + 1;
-        }
-        // Action
-        int128 x_y = div(x, y);
-        int128 y_x = div(y, x);
-        // Post-condition
-        assert(x_y != y_x);
     }
 }

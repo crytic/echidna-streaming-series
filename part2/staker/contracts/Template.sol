@@ -10,16 +10,6 @@ contract MockERC20 is ERC20 {
     function mint(address _to, uint256 _amount) external {
         _mint(_to, _amount);
     }
-    function transferFrom(
-        address from,
-        address to,
-        uint256 amount
-    ) public override returns (bool) {
-        address spender = msg.sender;
-        //_spendAllowance(from, spender, amount); // allowance was disabled
-        _transfer(from, to, amount);
-        return true;
-    }
 }
 
 // We are using an external testing methodology
@@ -31,7 +21,6 @@ contract EchidnaTemplate {
     // setup
     constructor() {
         tokenToStake = new MockERC20("Token", "TOK");
-        tokenToStake.mint(address(this), type(uint128).max);
         stakerContract = new Staker(address(tokenToStake));
     }
 

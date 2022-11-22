@@ -9,7 +9,7 @@ Welcome to Part 2 of the Echidna streaming series. This part has two sections:
 
 ## Slides
 
-The slides for this part can be found [here](TODO).
+The slides for this part can be found [here](./Echidna_Part_2_Slides.pdf).
 
 ## Video Presentation
 

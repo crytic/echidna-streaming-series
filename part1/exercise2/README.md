@@ -1,18 +1,16 @@
 # Exercise 2
 
-This exercise requires to finish the [exercise 1](Exercise-1.md).
-
 **Table of contents:**
 
-- [Targeted contract](#targeted-contract)
-- [Exercise](#exercice)
+- [Target contract](#target-contract)
+- [Exercise](#exercise)
 - [Solution](#solution)
 
 Join the team on Slack at: https://empireslacking.herokuapp.com/ #ethereum
 
-## Targeted contract
+## Target contract
   
-We will test the following contract *[exercises/exercise2/token.sol](./exercises/exercise2/token.sol)*:
+We will test the following contract (see [token.sol](./token.sol)):
 
 ```Solidity
  contract Ownership{
@@ -52,7 +50,7 @@ We will test the following contract *[exercises/exercise2/token.sol](./exercises
 
 ```
      
-## Testing access control
+## Exercise
 
 ### Goals
 
@@ -60,7 +58,7 @@ We will test the following contract *[exercises/exercise2/token.sol](./exercises
 - Add a property to check that the contract cannot be unpaused.
 - Once Echidna finds the bug, fix the issue, and re-try your property with Echidna.
 
-The skeleton for this exercise is (*[exercises/exercise2/template.sol](./exercises/exercise2/template.sol)*):
+The skeleton for this exercise is in [template.sol](./template.sol):
 
 ```Solidity
    import "token.sol";
@@ -77,4 +75,4 @@ The skeleton for this exercise is (*[exercises/exercise2/template.sol](./exercis
 
 ## Solution
 
- This solution can be found in [./exercises/exercise2/solution.sol](./exercises/exercise2/solution.sol)
+ This solution can be found in [solution.sol](./solution.sol)

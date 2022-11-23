@@ -13,7 +13,7 @@ The slides for this part can be found [here](./Echidna_Part_2_Slides.pdf).
 
 ## Video Presentation
 
-The video presentation for this part can be found on [YouTube](TODO).
+The video presentation for this part can be found on [YouTube](https://www.youtube.com/watch?v=9P7sqE6hILM&t=1s).
 
 ## Prerequisites (Staker)
 

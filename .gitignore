@@ -1,2 +1,7 @@
 **/crytic-export/*
 **/.DS_Store
+**/node_modules/*
+**/artifacts/*
+**/cache/**
+**/types/* 
+**/typechain/*

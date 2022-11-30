@@ -30,3 +30,8 @@ Note that each workshop will be live streamed on Trail of Bits' [Twitch channel]
 - This repository will be migrated to the [`building-secure-contracts`](https://github.com/crytic/building-secure-contracts) repository at the end of the series. We will update
 this README when that time comes.
 - This repository will be updated as the series continues. Thus, there might be some incomplete folders / broken links in the process.
+
+# Echidna Installation
+
+- Download [relevant binaries for your system](https://github.com/crytic/echidna/releases/tag/v2.0.4) 
+- Add to PATH* (All commands in respective README documents assume `echidna-test` refers to the binary) 

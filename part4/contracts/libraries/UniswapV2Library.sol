@@ -6,7 +6,7 @@ import "./SafeMath.sol";
 
 library UniswapV2Library {
     using SafeMath for uint;
-
+    
     // returns sorted token addresses, used to handle return values from pairs sorted in this order
     function sortTokens(address tokenA, address tokenB) internal pure returns (address token0, address token1) {
         require(tokenA != tokenB, 'UniswapV2Library: IDENTICAL_ADDRESSES');
@@ -21,7 +21,9 @@ library UniswapV2Library {
                 hex'ff',
                 factory,
                 keccak256(abi.encodePacked(token0, token1)),
-                hex'96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f' // init code hash
+                //hex'8b4bc2003cec5245d65772299d0d110784f8288e034946d115bd65421d3bccea'
+                hex'40ccc7d6659c66489c67f86ee7da56ef3d635186e37713baa8676c9dee5f9325' 
+                //hex'96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f' // init code hash
             )))));
     }
 

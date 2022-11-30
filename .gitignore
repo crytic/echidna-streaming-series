@@ -1,1 +1,3 @@
 **/crytic-export/*
+**/node-modules/*
+**/corpus/*

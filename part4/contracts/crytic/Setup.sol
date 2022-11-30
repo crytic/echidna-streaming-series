@@ -14,46 +14,59 @@ contract Users {
     (success, returnData) = address(target).call(_calldata);
   }
 }
-
-
+//note todos:
+//make things arrays and introduce dynamic testing
+//users 1 and 2 should be dynamic, same for swaps 
+//1.Users array, make token array, when fuzzing use amount + between to index into arrays 
+// track k is monotonically increasing (system_level_test) 
+//state variable for probability???
+//use init function like in audits
 contract Setup {
-    UniswapV2ERC20 testToken1;
+    UniswapV2ERC20 testToken1; //can use mocks here but I was lazy and it ended up costing me my sanity
     UniswapV2ERC20 testToken2;
     UniswapV2Pair testPair;
     UniswapV2Factory factory;
     UniswapV2Router01 router;
     Users[] users;
+    bool complete;
+   
     constructor() public {
         testToken1 = new UniswapV2ERC20();
         testToken2 = new UniswapV2ERC20();
-        factory = new UniswapV2Factory(address(this)); //this contract will receive fees
+        factory = new UniswapV2Factory(address(this)); //this contract will be the fee setter
         router = new UniswapV2Router01(address(factory),address(0)); // we don't need to test WETH pairs for now
-        //address pair = factory.createPair(address(testToken1), address(testToken2));
-        //testPair = UniswapV2Pair(pair);
+        address pair = factory.createPair(address(testToken1), address(testToken2));
+        testPair = UniswapV2Pair(pair);
         _createUsers();
-        _mintTokens();
-        _doApprovals();
+        
 
     }
     function _createUsers() internal {
-        for(uint i; i < 2; ++i) {
-            users.push(new Users()); // user 0 is LP, user 1 is user
+        for(uint i; i < 3; ++i) {
+            users.push(new Users()); // 3 random gamblers
         }
     }
-    function _mintTokens() internal {
-            testToken2.mint(address(users[0]), 200000e18);
-            testToken1.mint(address(users[0]), 200000e18); 
-            testToken2.mint(address(users[1]), 20000e18);
-            testToken1.mint(address(users[1]), 20000e18);
+    function _mintTokens(uint amount1, uint amount2) internal {
+            for(uint i; i<3; ++i) {
+               testToken2.mint(address(users[i]), amount2);
+               testToken1.mint(address(users[i]), amount1); 
             
+            }
         
     }
     function _doApprovals() internal {
-      for(uint i; i < 2; ++i) {
+      for(uint i; i < 3; ++i) {
            users[i].proxy(address(testToken1),abi.encodeWithSelector(testToken1.approve.selector,address(router), uint(-1)));
            users[i].proxy(address(testToken2),abi.encodeWithSelector(testToken2.approve.selector,address(router), uint(-1)));
            
         }
+    }
+    function _init(uint amount1, uint amount2) internal {
+      amount1 = _between(amount1, 1000, 2**255);
+      amount2 = _between(amount2, 1000, 2**255);
+      _mintTokens(amount1,amount2);
+      _doApprovals();
+      complete = true;
     }
     
     

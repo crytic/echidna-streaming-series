@@ -1,4 +1,5 @@
 **/crytic-export/*
+**/node-modules/*
 **/corpus/*
 **/.DS_Store
 **/types/* 

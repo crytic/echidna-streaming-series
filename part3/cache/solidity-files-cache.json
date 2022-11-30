@@ -1,0 +1,667 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "/Users/technovision99/echidna-streaming-series/part3/contracts/crytic/EchidnaTest.sol": {
+      "lastModificationDate": 1669744951942,
+      "contentHash": "123555ff5e8c4945a8985488127808ab",
+      "sourceName": "contracts/crytic/EchidnaTest.sol",
+      "solcConfig": {
+        "version": "0.6.6",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./Setup.sol"
+      ],
+      "versionPragmas": [
+        "^0.6.0"
+      ],
+      "artifacts": [
+        "EchidnaTest"
+      ]
+    },
+    "/Users/technovision99/echidna-streaming-series/part3/contracts/crytic/Setup.sol": {
+      "lastModificationDate": 1669661741146,
+      "contentHash": "769d19724ee3a4a133b6158c124b5107",
+      "sourceName": "contracts/crytic/Setup.sol",
+      "solcConfig": {
+        "version": "0.6.6",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../uni-v2/UniswapV2Factory.sol",
+        "../uni-v2/UniswapV2Pair.sol",
+        "../uni-v2/UniswapV2ERC20.sol",
+        "../uni-v2/UniswapV2Router01.sol"
+      ],
+      "versionPragmas": [
+        "^0.6.0"
+      ],
+      "artifacts": [
+        "Setup",
+        "Users"
+      ]
+    },
+    "/Users/technovision99/echidna-streaming-series/part3/contracts/uni-v2/UniswapV2Factory.sol": {
+      "lastModificationDate": 1669172316598,
+      "contentHash": "09fb816d253cd98be54897438ea7af7d",
+      "sourceName": "contracts/uni-v2/UniswapV2Factory.sol",
+      "solcConfig": {
+        "version": "0.6.6",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../interfaces/IUniswapV2Factory.sol",
+        "./UniswapV2Pair.sol"
+      ],
+      "versionPragmas": [
+        "^0.6.0"
+      ],
+      "artifacts": [
+        "UniswapV2Factory"
+      ]
+    },
+    "/Users/technovision99/echidna-streaming-series/part3/contracts/uni-v2/UniswapV2Pair.sol": {
+      "lastModificationDate": 1669749894700,
+      "contentHash": "b30b89ff6e0c30ff67c58afd6f6f1f32",
+      "sourceName": "contracts/uni-v2/UniswapV2Pair.sol",
+      "solcConfig": {
+        "version": "0.6.6",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../interfaces/IUniswapV2Pair.sol",
+        "./UniswapV2ERC20.sol",
+        "../libraries/Math.sol",
+        "../libraries/UQ112x112.sol",
+        "../interfaces/IERC20.sol",
+        "../interfaces/IUniswapV2Factory.sol",
+        "../interfaces/IUniswapV2Callee.sol"
+      ],
+      "versionPragmas": [
+        "^0.6.0"
+      ],
+      "artifacts": [
+        "UniswapV2Pair"
+      ]
+    },
+    "/Users/technovision99/echidna-streaming-series/part3/contracts/uni-v2/UniswapV2ERC20.sol": {
+      "lastModificationDate": 1669172317853,
+      "contentHash": "10ef74836d134f3e2f7663b3cda6f247",
+      "sourceName": "contracts/uni-v2/UniswapV2ERC20.sol",
+      "solcConfig": {
+        "version": "0.6.6",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../interfaces/IUniswapV2ERC20.sol",
+        "../libraries/SafeMath.sol"
+      ],
+      "versionPragmas": [
+        "^0.6.0"
+      ],
+      "artifacts": [
+        "UniswapV2ERC20"
+      ]
+    },
+    "/Users/technovision99/echidna-streaming-series/part3/contracts/uni-v2/UniswapV2Router01.sol": {
+      "lastModificationDate": 1669171728661,
+      "contentHash": "a91e56964082c3d4d1e88f3473069f19",
+      "sourceName": "contracts/uni-v2/UniswapV2Router01.sol",
+      "solcConfig": {
+        "version": "0.6.6",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../interfaces/IUniswapV2Factory.sol",
+        "../libraries/TransferHelper.sol",
+        "../libraries/UniswapV2Library.sol",
+        "../interfaces/IUniswapV2Router01.sol",
+        "../interfaces/IERC20.sol",
+        "../interfaces/IWETH.sol"
+      ],
+      "versionPragmas": [
+        "=0.6.6"
+      ],
+      "artifacts": [
+        "UniswapV2Router01"
+      ]
+    },
+    "/Users/technovision99/echidna-streaming-series/part3/contracts/libraries/Math.sol": {
+      "lastModificationDate": 1669171590641,
+      "contentHash": "7d49efc28437077822b57cc14562decb",
+      "sourceName": "contracts/libraries/Math.sol",
+      "solcConfig": {
+        "version": "0.6.6",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.6.0"
+      ],
+      "artifacts": [
+        "Math"
+      ]
+    },
+    "/Users/technovision99/echidna-streaming-series/part3/contracts/libraries/UQ112x112.sol": {
+      "lastModificationDate": 1669171590643,
+      "contentHash": "89f431079e3f162414ad41401511e732",
+      "sourceName": "contracts/libraries/UQ112x112.sol",
+      "solcConfig": {
+        "version": "0.6.6",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.6.0"
+      ],
+      "artifacts": [
+        "UQ112x112"
+      ]
+    },
+    "/Users/technovision99/echidna-streaming-series/part3/contracts/interfaces/IWETH.sol": {
+      "lastModificationDate": 1669171590617,
+      "contentHash": "44ce7026ece8ae7061ce8bd9c245bb3d",
+      "sourceName": "contracts/interfaces/IWETH.sol",
+      "solcConfig": {
+        "version": "0.8.17",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.5.0"
+      ],
+      "artifacts": [
+        "IWETH"
+      ]
+    },
+    "/Users/technovision99/echidna-streaming-series/part3/contracts/interfaces/IERC20.sol": {
+      "lastModificationDate": 1669171590615,
+      "contentHash": "3d2b948a9266ee66b6e739de97c7e6e9",
+      "sourceName": "contracts/interfaces/IERC20.sol",
+      "solcConfig": {
+        "version": "0.8.17",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.5.0"
+      ],
+      "artifacts": [
+        "IERC20"
+      ]
+    },
+    "/Users/technovision99/echidna-streaming-series/part3/contracts/interfaces/IUniswapV2Callee.sol": {
+      "lastModificationDate": 1669171590615,
+      "contentHash": "30a4aed15b3fa3ce5588118b7cecfa7f",
+      "sourceName": "contracts/interfaces/IUniswapV2Callee.sol",
+      "solcConfig": {
+        "version": "0.8.17",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.5.0"
+      ],
+      "artifacts": [
+        "IUniswapV2Callee"
+      ]
+    },
+    "/Users/technovision99/echidna-streaming-series/part3/contracts/interfaces/IUniswapV2Factory.sol": {
+      "lastModificationDate": 1669171590616,
+      "contentHash": "ec39b5372f4f4d52101b4da561e2aee6",
+      "sourceName": "contracts/interfaces/IUniswapV2Factory.sol",
+      "solcConfig": {
+        "version": "0.8.17",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.5.0"
+      ],
+      "artifacts": [
+        "IUniswapV2Factory"
+      ]
+    },
+    "/Users/technovision99/echidna-streaming-series/part3/contracts/libraries/SafeMath.sol": {
+      "lastModificationDate": 1669171590642,
+      "contentHash": "020a2ac7e358da5c25f2400cc96bc37c",
+      "sourceName": "contracts/libraries/SafeMath.sol",
+      "solcConfig": {
+        "version": "0.8.17",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.5.16"
+      ],
+      "artifacts": [
+        "SafeMath"
+      ]
+    },
+    "/Users/technovision99/echidna-streaming-series/part3/contracts/libraries/UniswapV2Library.sol": {
+      "lastModificationDate": 1669171590644,
+      "contentHash": "dc62126f6dd1a2478854416ff0b30117",
+      "sourceName": "contracts/libraries/UniswapV2Library.sol",
+      "solcConfig": {
+        "version": "0.8.17",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../interfaces/IUniswapV2Pair.sol",
+        "./SafeMath.sol"
+      ],
+      "versionPragmas": [
+        ">=0.5.0"
+      ],
+      "artifacts": [
+        "UniswapV2Library"
+      ]
+    },
+    "/Users/technovision99/echidna-streaming-series/part3/contracts/interfaces/IUniswapV2Pair.sol": {
+      "lastModificationDate": 1669171590617,
+      "contentHash": "3fa31c3860f2b9585c3a98c64850829e",
+      "sourceName": "contracts/interfaces/IUniswapV2Pair.sol",
+      "solcConfig": {
+        "version": "0.8.17",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.5.0"
+      ],
+      "artifacts": [
+        "IUniswapV2Pair"
+      ]
+    },
+    "/Users/technovision99/echidna-streaming-series/part3/contracts/interfaces/IUniswapV2ERC20.sol": {
+      "lastModificationDate": 1669171590616,
+      "contentHash": "752c725168e1a5b73a8209897f18c5b9",
+      "sourceName": "contracts/interfaces/IUniswapV2ERC20.sol",
+      "solcConfig": {
+        "version": "0.8.17",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.5.0"
+      ],
+      "artifacts": [
+        "IUniswapV2ERC20"
+      ]
+    },
+    "/Users/technovision99/echidna-streaming-series/part3/contracts/interfaces/IUniswapV2Router01.sol": {
+      "lastModificationDate": 1669171590617,
+      "contentHash": "3526c6d8e16194c21ba5df9314876f13",
+      "sourceName": "contracts/interfaces/IUniswapV2Router01.sol",
+      "solcConfig": {
+        "version": "0.8.17",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.6.2"
+      ],
+      "artifacts": [
+        "IUniswapV2Router01"
+      ]
+    },
+    "/Users/technovision99/echidna-streaming-series/part3/contracts/libraries/TransferHelper.sol": {
+      "lastModificationDate": 1669171590642,
+      "contentHash": "d9a9f3cf900d3e945622c19bc6b2a824",
+      "sourceName": "contracts/libraries/TransferHelper.sol",
+      "solcConfig": {
+        "version": "0.8.17",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.6.0"
+      ],
+      "artifacts": [
+        "TransferHelper"
+      ]
+    }
+  }
+}

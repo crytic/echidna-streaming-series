@@ -79,3 +79,5 @@ contract Setup {
   }
     
 }
+//similar to part3
+// continue on part3, code swap up test basic invariants

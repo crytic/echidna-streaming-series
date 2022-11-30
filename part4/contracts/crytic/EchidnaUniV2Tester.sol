@@ -1,6 +1,6 @@
 pragma solidity ^0.6.0;
 import "./Setup.sol";
-
+//check time, focus more on setup
 contract EchidnaUniV2Tester is Setup {
      event AssertionFailed(bool result);
      event failed(uint num);
@@ -87,6 +87,7 @@ contract EchidnaUniV2Tester is Setup {
        
         
     } */
+
     function testSwapTokens(uint swapAmountIn, uint tokenSelect) public {
        if(!complete) {
             _init(swapAmountIn,swapAmountIn);

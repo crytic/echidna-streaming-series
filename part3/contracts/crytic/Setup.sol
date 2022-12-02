@@ -30,7 +30,7 @@ contract Setup {
     }
 
     function _init(uint amount1, uint amount2) internal {
-        testToken1.mint(address(user),amount1);
+        testToken1.mint(address(user), amount1);
         testToken2.mint(address(user), amount2);
         completed = true;
     }

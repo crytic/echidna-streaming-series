@@ -1,6 +1,7 @@
 pragma solidity ^0.6.0;
 
 import "./Setup.sol";
+import '../libraries/Math.sol';
 
 contract EchidnaTest is Setup {
     function testProvideLiquidity(uint amount1, uint amount2) public {
@@ -37,6 +38,7 @@ contract EchidnaTest is Setup {
         // If any failure condition is met, user should not be awarded any LP tokens
         else {
             assert(pair.balanceOf(address(user)) == 0);
+            assert(amount1 > 2**112 - 1 || amount2 > 2**112 - 1 || Math.sqrt(amount1 * amount2) < 10**3);
         }
 
 

@@ -23,7 +23,9 @@ contract EchidnaTest is Setup {
         (bool success3,) = user.proxy(address(pair),abi.encodeWithSelector(bytes4(keccak256("mint(address)")), address(user)));
         
         //Postconditions:
-        // success3 should only be true if the minimimum liquidity was met
+        // success3 should only be true if:
+        // - the minimimum liquidity was met, AND
+        // - token amount transferred is less than 2**112 - 1
         if(success3) {
             uint lpTokenBalanceAfter = pair.balanceOf(address(user));
             (uint reserve0After, uint reserve1After,) = pair.getReserves();
@@ -32,7 +34,7 @@ contract EchidnaTest is Setup {
             assert(kBefore < kAfter);
 
         }
-        // If not enough liquidity was provided, user should not be awarded any LP tokens
+        // If any failure condition is met, user should not be awarded any LP tokens
         else {
             assert(pair.balanceOf(address(user)) == 0);
         }

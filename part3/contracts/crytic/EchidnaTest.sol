@@ -2,8 +2,11 @@ pragma solidity ^0.6.0;
 
 import "./Setup.sol";
 import '../libraries/Math.sol';
+import '../libraries/SafeMath.sol';
 
 contract EchidnaTest is Setup {
+    using SafeMath for uint;
+
     function testProvideLiquidity(uint amount1, uint amount2) public {
         //Preconditions: 
         amount1 = _between(amount1, 1, uint(-1));
@@ -42,5 +45,23 @@ contract EchidnaTest is Setup {
         }
 
 
+    }
+
+    event SqrtInputs(uint,uint);
+    event SqrtRoots(uint,uint);
+    event SqrtProduct(uint,uint);
+    event SqrtQuotient(uint,uint);
+    function testSqrt(uint a, uint b) public {
+        require(a > 0 && b > 0);
+        emit SqrtInputs(a, b);
+        emit SqrtRoots(Math.sqrt(a), Math.sqrt(b));
+
+        // Validate the product property: sqrt(a) * sqrt(b) == sqrt(a * b)
+        emit SqrtProduct(Math.sqrt(a).mul(Math.sqrt(b)), Math.sqrt(a.mul(b)));
+        assert(Math.sqrt(a).mul(Math.sqrt(b)) == Math.sqrt(a.mul(b)));
+
+        // Validate the quotient property: sqrt(a) / sqrt(b) == sqrt(a / b)
+        emit SqrtQuotient(Math.sqrt(a) / Math.sqrt(b), Math.sqrt(a / b));
+        assert(Math.sqrt(a) / Math.sqrt(b) == Math.sqrt(a / b));
     }
 }

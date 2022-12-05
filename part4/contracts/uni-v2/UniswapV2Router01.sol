@@ -1,12 +1,12 @@
 pragma solidity =0.6.6;
 
-import './interfaces/IUniswapV2Factory.sol';
-import './libraries/TransferHelper.sol';
+import '../interfaces/IUniswapV2Factory.sol';
+import '../libraries/TransferHelper.sol';
 
-import './libraries/UniswapV2Library.sol';
-import './interfaces/IUniswapV2Router01.sol';
-import './interfaces/IERC20.sol';
-import './interfaces/IWETH.sol';
+import '../libraries/UniswapV2Library.sol';
+import '../interfaces/IUniswapV2Router01.sol';
+import '../interfaces/IERC20.sol';
+import '../interfaces/IWETH.sol';
 
 contract UniswapV2Router01 is IUniswapV2Router01 {
     address public immutable override factory;

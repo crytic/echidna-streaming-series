@@ -6,7 +6,8 @@ contract EchidnaUniV2Tester is Setup {
     event logUints(uint kBefore, uint kAfter);
     function testProvideLiquidityInvariants(uint amount1, uint amount2) public {
         //PRECONDITIONS:
-
+        amount1 = _between(amount1, 1000, uint(-1));
+        amount2 = _between(amount2, 1000, uint(-1));
         if(!complete) {
             _init(amount1,amount2);
         }
@@ -47,6 +48,9 @@ contract EchidnaUniV2Tester is Setup {
 
         uint prevBal1 = UniswapV2ERC20(path[0]).balanceOf(address(user));
         uint prevBal2 = UniswapV2ERC20(path[1]).balanceOf(address(user));
+
+        require(prevBal1 > 0);
+        swapAmountIn = _between(swapAmountIn, 1, prevBal1);
         (uint reserve1Before, uint reserve2Before) = UniswapV2Library.getReserves(address(factory), address(testToken1), address(testToken2));
         uint kBefore = reserve1Before * reserve2Before; 
         //CALL: 

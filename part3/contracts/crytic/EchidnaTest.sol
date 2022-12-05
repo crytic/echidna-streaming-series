@@ -33,7 +33,7 @@ contract EchidnaTest is Setup {
 
         }
     }
-     function testSwap(uint amount1, uint amount2) public {
+    function testSwap(uint amount1, uint amount2) public {
         
         if(!completed) {
             _init(amount1, amount2);
@@ -41,7 +41,7 @@ contract EchidnaTest is Setup {
         
         //Preconditions
         pair.sync(); // we matched the balances with reserves
-        require(pair.balanceOf(address(user))>0); //there is liquidity for the swap
+        require(pair.balanceOf(address(user)) > 0); //there is liquidity for the swap
         //Call:
         (bool success1,) = user.proxy(address(pair), abi.encodeWithSelector(pair.swap.selector, amount1,amount2,address(user),""));
 
@@ -49,9 +49,8 @@ contract EchidnaTest is Setup {
         assert(!success1); //call should never succeed
 
 
-
+    
     }
-
 }
 
    

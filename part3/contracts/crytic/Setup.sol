@@ -17,7 +17,7 @@ contract Setup {
     UniswapV2ERC20 testToken2;
     Users user;
     bool completed;
-    event CallPassed(bool success);
+    
     constructor() public {
         testToken1 = new UniswapV2ERC20();
         testToken2 = new UniswapV2ERC20();

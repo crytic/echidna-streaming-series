@@ -1,9 +1,5 @@
 
-
-#### To use:
-
-
-# Part 3: Fuzzing arithmetics and functions
+# Part 3: Fuzzing Uniswap V2 (Part 1)
 
 ## Sections
 

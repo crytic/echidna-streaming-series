@@ -32,6 +32,7 @@ contract EchidnaTest is Setup {
             assert(kBefore < kAfter);
 
         }
+
     }
     function testSwap(uint amount1, uint amount2) public {
         
@@ -52,5 +53,3 @@ contract EchidnaTest is Setup {
     
     }
 }
-
-   

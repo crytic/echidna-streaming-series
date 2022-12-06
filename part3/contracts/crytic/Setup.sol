@@ -1,12 +1,12 @@
 pragma solidity ^0.6.0;
-import "../uni-v2/UniswapV2Factory.sol";
-import "../uni-v2/UniswapV2Pair.sol";
+
 import "../uni-v2/UniswapV2ERC20.sol";
-import "../uni-v2/UniswapV2Router01.sol";
+import "../uni-v2/UniswapV2Pair.sol";
+import "../uni-v2/UniswapV2Factory.sol";
 
 contract Users {
-    function proxy(address target, bytes memory data) public returns(bool success,bytes memory retData) {
-        (success, retData) = address(target).call(data);
+    function proxy(address target, bytes memory data) public returns (bool success, bytes memory retData) {
+        return target.call(data);
     }
 }
 

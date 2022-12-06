@@ -4,6 +4,6 @@
 **/.DS_Store
 **/types/* 
 **/typechain/*
-node_modules/
 **/artifacts/*
 **/cache/*
+

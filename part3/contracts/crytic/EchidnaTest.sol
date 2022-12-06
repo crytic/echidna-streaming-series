@@ -3,13 +3,14 @@ pragma solidity ^0.6.0;
 import "./Setup.sol";
 
 contract EchidnaTest is Setup {
+    event logUints(uint unit1, uint unit2);
     function testProvideLiquidity(uint amount1, uint amount2) public {
         //Preconditions: 
         amount1 = _between(amount1, 1000, uint(-1));
         amount2 = _between(amount2, 1000, uint(-1));
 
         if(!completed) {
-            _mintTokens(amount1, amount2);
+            _init(amount1, amount2);
         }
         uint lpTokenBalanceBefore = pair.balanceOf(address(user));
         (uint reserve0Before, uint reserve1Before,) = pair.getReserves();
@@ -32,7 +33,23 @@ contract EchidnaTest is Setup {
 
         }
 
-
     }
+    function testSwap(uint amount1, uint amount2) public {
+        
+        if(!completed) {
+            _init(amount1, amount2);
+        }
+        
+        //Preconditions
+        pair.sync(); // we matched the balances with reserves
+        require(pair.balanceOf(address(user)) > 0); //there is liquidity for the swap
+        //Call:
+        (bool success1,) = user.proxy(address(pair), abi.encodeWithSelector(pair.swap.selector, amount1,amount2,address(user),""));
 
+        //Postcondition:
+        assert(!success1); //call should never succeed
+
+
+    
+    }
 }

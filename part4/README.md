@@ -13,7 +13,7 @@ The slides for this part can be found [here](./Echidna-Streaming-Session-Part-3.
 
 ## Video Presentation
 
-The video presentation for this part can be found on [YouTube](https://www.youtube.com/watch?v=n0RaKKVTGvA).
+The video presentation for this part can be found on [YouTube](https://www.youtube.com/watch?v=OPDA0L9SeNI).
 
 ## Prerequisites 
 

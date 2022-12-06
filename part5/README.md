@@ -28,7 +28,9 @@ Note: Implementations for these will be implemented in Part 6.
   - Strike = 0 should always revert 
   - Sigma < 1 should always revert
 
-**Engine Deposits**
+## Deposits and Withdrawals 
+
+**Engine Deposit**
 - Users can never deposit 0 tokens into the system 
 - Under correct preconditions, deposit should always increase a recipient's balance 
 - Engine's risky and stable balance should always increase
@@ -40,6 +42,13 @@ Note: Implementations for these will be implemented in Part 6.
 
 **Inter-related Operations** 
 - A deposit and withdrawal should result in the same pre- and post-margin balances 
+## Remove and Allocate
+**Engine Allocate** 
+- Liquidity chooses the minimum of the liquidity factors 
+- An allocation to a pool should result in an increase to pool reserves 
+
+**Engine Remove** 
+- Removing from a pool should result in a decrease to pool reserves 
 
 ## Running Code (for Part 5)
 

@@ -1,57 +1,119 @@
-// SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
-
-import "../libraries/ReplicationMath.sol";
-import "../libraries/Units.sol";
-import "../libraries/ABDKMath64x64.sol";
-import "../libraries/CumulativeNormalDistribution.sol";
 import "../libraries/Margin.sol";
+import "../libraries/Reserve.sol";
+import "../libraries/Units.sol";
 
-// npx hardhat clean && npx hardhat compile && echidna-test-2.0 . --contract LibraryMathEchidna --test-mode assertion
-contract LibraryMathEchidna { 
-	event AssertionFailed(string functionName, int128 v1, uint256 v2); 
-	using ReplicationMath for int128;
-	using Units for int128;
+contract LibraryTest { 
 	using Units for uint256;
-	using ABDKMath64x64 for int128;
-	using ABDKMath64x64 for uint256;
-	using CumulativeNormalDistribution for int128;
-	event P(int128 a, int128 c,int64 b);
-	// Helper Functions for ReplicationMath.sol
-	function realisticSigma(uint256 sigma) internal pure returns(uint256) { 
-		// between 1 to 1e7 
-		return uint256(1 + sigma % (1e7 - 1));
-	}
-	function realisticGamma(uint256 sigma ) internal pure returns(uint256) { 
-		// between 9000 to Units.PERCENTAGE
-		return uint256(9000 + sigma % (Units.PERCENTAGE - 9000));
-	}
-	function realisticAmountIncludingOne(uint256 amount) internal pure returns(uint256) { 
-		// between 1 - 100000 ether
-		return uint256(1 + amount% (100000 ether + 1));
-	}
-	Margin.Data margin = Margin.Data(0,0);
-	// --------------------- Margin.sol -----------------------
-	function depositIncreasesBalance(uint256 risky, uint256 stable) public { 
-		uint256 pre_deposit_bal_risky = margin.balanceRisky;
-		uint256 pre_deposit_bal_stable = margin.balanceStable;
-		Margin.deposit(margin, risky, stable);
+	using Units for int128;
+	mapping (address => Margin.Data) private margins;
+	Margin.Data margin;
 
-		assert(margin.balanceRisky - pre_deposit_bal_risky == risky);
-		assert(margin.balanceStable - pre_deposit_bal_stable == stable);
-	}
-	mapping (address => Margin.Data) margins;
-	function withdrawDecreasesBalance(uint256 risky, uint256 stable) public { 
-		margins[address(this)] = margin;
-		uint256 pre_deposit_bal_risky = margins[address(this)].balanceRisky;
-		uint256 pre_deposit_bal_stable = margins[address(this)].balanceStable;
-		Margin.withdraw(margins, risky, stable);
+	event LogUint256(string msg, uint256 value);
+	event AssertionFailed(string msg, uint256 expected, uint256 value);
 
-		assert(pre_deposit_bal_risky - margins[address(this)].balanceRisky  == risky);
-		assert(pre_deposit_bal_stable - margins[address(this)].balanceStable == stable);
+	// --------------------- Margins.sol -----------------------
+	function margin_deposit(uint256 riskyAmt, uint256 stableAmt) public {
+		uint256 preRisky = margin.balanceRisky;
+		uint256 preStable = margin.balanceStable;
+
+		Margin.deposit(margin, riskyAmt, stableAmt);
+		
+		assert(margin.balanceRisky - riskyAmt == preRisky);
+		assert(margin.balanceStable - stableAmt == preStable);
+	}
+	function margin_withdraw(uint256 riskyAmt, uint256 stableAmt) public {
+		uint256 preRisky = margin.balanceRisky;
+		uint256 preStable = margin.balanceStable;
+
+		Margin.withdraw(margins, riskyAmt, stableAmt);
+		
+		assert(margin.balanceRisky == preRisky - riskyAmt);
+		assert(margin.balanceStable == preStable - stableAmt);
+	}
+	// --------------------- Reserves.sol -----------------------	
+	Reserve.Data private reserve;
+	bool isSetup;
+	function setupReserve() private {
+		reserve.reserveRisky = 1 ether;
+		reserve.reserveStable = 2 ether;
+		reserve.liquidity = 3 ether;
+		isSetup = true;
+	}
+	function reserve_allocate(uint256 delRisky, uint256 delStable) public returns (uint256, uint256, uint256, uint256){
+		if (!isSetup) { 
+			setupReserve();
+		}
+		uint256 preRisky = reserve.reserveRisky;
+		uint256 preStable = reserve.reserveStable;
+		uint256 preLiquidity = reserve.liquidity;
+	
+		//blank copy from allocate function
+		uint256 liquidity0 = (delRisky * reserve.liquidity) / uint256(reserve.reserveRisky);
+        uint256 liquidity1 = (delStable * reserve.liquidity) / uint256(reserve.reserveStable);
+        uint256 delLiquidity = liquidity0 < liquidity1 ? liquidity0 : liquidity1;	
+		
+		Reserve.allocate(reserve,delRisky,delStable,delLiquidity,uint32(block.timestamp + 1000));
+
+		assert(preRisky + delRisky == reserve.reserveRisky);
+		assert(preStable + delStable == reserve.reserveStable);
+		assert(preLiquidity + delLiquidity == reserve.liquidity);
+
+		return (preRisky, preStable, preLiquidity, delLiquidity);
+	}
+	function reserve_remove(uint256 delLiquidity) public {
+		if (!isSetup) { 
+			setupReserve();
+		}		
+		delLiquidity = _between(delLiquidity, 1, type(uint64).max);		
+		uint256 preRisky = reserve.reserveRisky;
+		uint256 preStable = reserve.reserveStable;
+		uint256 preLiquidity = reserve.liquidity;
+		(uint256 delRisky, uint256 delStable) = Reserve.getAmounts(reserve,delLiquidity);		
+		
+		Reserve.remove(reserve,delRisky,delStable,delLiquidity,uint32(block.timestamp + 1000));
+
+		assert(preRisky == reserve.reserveRisky + delRisky);
+		assert(preStable == reserve.reserveStable + delStable );
+		assert(preLiquidity == reserve.liquidity + delLiquidity);
 	}
 
-	// --------------------- Units.sol -----------------------
+	function allocate_then_remove(uint256 delRisky, uint256 delStable) public {
+		delRisky = _between(delRisky, 1, type(uint64).max);
+		delStable = _between(delStable, 1, type(uint64).max);
+
+		emit LogUint256("delRisky", delRisky);
+		emit LogUint256("delStable", delStable);
+		
+		(uint256 preAllocateRisky, 
+		uint256 preAllocateStable, 
+		uint256 preAllocateLiquidity, 
+		uint256 delAllocateLiquidity
+		) = reserve_allocate(delRisky, delStable);
+
+		(uint256 delRemoveRisky, uint256 delRemoveStable) = Reserve.getAmounts(reserve, delAllocateLiquidity);
+
+		Reserve.remove(reserve,delRemoveRisky,delRemoveStable,delAllocateLiquidity,uint32(block.timestamp + 1000));
+		bool shouldFail;
+
+		if(preAllocateRisky != reserve.reserveRisky) { 
+			emit AssertionFailed("preallocate risky not equivalent to current risky", preAllocateRisky, reserve.reserveRisky);
+			shouldFail = true;
+		}
+		if(preAllocateStable  != reserve.reserveStable) {
+			emit AssertionFailed("preallocate stable not equivalent to current stable", preAllocateStable, reserve.reserveStable);
+			shouldFail = true;		
+		}
+		if(preAllocateLiquidity  != reserve.liquidity) {
+			emit AssertionFailed("preallocate liq not equivalent to current liq", preAllocateLiquidity, reserve.liquidity);
+			shouldFail = true;					
+		}
+		if (shouldFail) {
+			assert(false);
+		}
+	}
+
+	// // --------------------- Units.sol -----------------------
 	function scaleUpAndScaleDownInverses(uint256 value, uint256 factor) public {
 		uint256 scaledFactor = (10e18+ factor % (10e18 + 1));
 
@@ -72,62 +134,8 @@ contract LibraryMathEchidna {
 		assert(scaledDownValue == value);
 	}
 
-	// --------------------- CumulativeNormalDistribution.sol -----------------------
 
-	function getCDFPaper(int128 x) internal pure returns (int128) {
-		int128 z = x.div(CumulativeNormalDistribution.CDF3);
-		int128 t = CumulativeNormalDistribution.ONE_INT.div(CumulativeNormalDistribution.ONE_INT.add(CumulativeNormalDistribution.CDF0.mul(z.abs())));
-		int128 erf = getErrorFunctionPaper(z, t);
-		if (z < 0) {
-			erf = erf.neg();
-		}
-		int128 result = (CumulativeNormalDistribution.HALF_INT).mul(CumulativeNormalDistribution.ONE_INT.add(erf));
-		return result;
-	}
-
-	// https://personal.math.ubc.ca/~cbm/aands/abramowitz_and_stegun.pdf
-	// Approximation 7.1.26
-	function getErrorFunctionPaper(int128 z, int128 t) internal pure returns (int128) {
-		int128 a1t = CumulativeNormalDistribution.CDF1.mul(t);
-		int128 a2t = CumulativeNormalDistribution.CDF2.mul(t.pow(2));
-		int128 a3t = CumulativeNormalDistribution.CDF3.mul(t.pow(3));
-		int128 a4t = CumulativeNormalDistribution.CDF4.mul(t.pow(4));
-		int128 a5t = CumulativeNormalDistribution.CDF5.mul(t.pow(5));
-		int128 sum = a1t + a2t + a3t + a4t + a5t;
-		int128 result = CumulativeNormalDistribution.ONE_INT.sub(sum.mul((z.mul(z).neg()).exp()));
-		return result;
-	}
-
-	function realisticCDFInput(uint128 x, uint128 neg) internal returns (int128) {
-		if (neg % 2 == 0) {
-			return -int128(x); 
-		}
-		return int128(x);		
-	}
-	function compareCDFimplementations(uint128 x, uint128 neg) public {
-		int128 x = realisticCDFInput(x, neg);
-
-		int128 resPaper = getCDFPaper(x);
-		int128 resCurrentImplementation = x.getCDF();
-		assert(resPaper == resCurrentImplementation);
-	}
-
-	function compareCDFImplementationsDiff(uint128 x, uint128 neg) public {
-		int128 x_x = realisticCDFInput(x, neg);
-
-		int128 resPaper = getCDFPaper(x_x);
-		int128 resCurrentImplementation = x_x.getCDF();
-		int128 diff = resPaper > resCurrentImplementation ? 
-						resPaper - resCurrentImplementation :
-						resCurrentImplementation - resPaper;
-		assert(diff <= 1);
-	}
-
-	function CDFCheckRange(uint128 x, uint128 neg) public {
-		int128 x_x = realisticCDFInput(x, neg);
-			
-		int128 res = x_x.getCDF();
-		emit P(x_x, res, res.toInt());
-		assert(res > 0 && res.toInt() < 1);
+	function _between(uint256 random, uint256 low, uint256 high) private returns (uint256) {
+		return low + random % (high-low);
 	}
 }

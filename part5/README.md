@@ -5,6 +5,9 @@
 - [Withdrawals decrease margin balances](https://github.com/crytic/echidna-streaming-series/blob/1525cf004e6060d9a342e2946e8c3550b2e4bace/part5/contracts/echidna/LibraryMathEchidna.sol#L44-L52)
 - [Scale up and scale down are exact inverses](https://github.com/crytic/echidna-streaming-series/blob/1525cf004e6060d9a342e2946e8c3550b2e4bace/part5/contracts/echidna/LibraryMathEchidna.sol#L55-L62)
 - [Scale to X64 and from X64 are exact inverses](https://github.com/crytic/echidna-streaming-series/blob/1525cf004e6060d9a342e2946e8c3550b2e4bace/part5/contracts/echidna/LibraryMathEchidna.sol#L63-L73)
+- [Allocating to a pool increases its respective reserve balance](https://github.com/crytic/echidna-streaming-series/blob/9e1aca6efc057fd729d3c27145490fb15971fba8/part5/contracts/echidna/LibraryMathEchidna.sol#L43-L63)
+- [Removing from a pool decreases its respective reserve balance](https://github.com/crytic/echidna-streaming-series/blob/9e1aca6efc057fd729d3c27145490fb15971fba8/part5/contracts/echidna/LibraryMathEchidna.sol#L64-L79)
+- [Allocating then removing from a pool should result in the same pre- and post- balances](https://github.com/crytic/echidna-streaming-series/blob/9e1aca6efc057fd729d3c27145490fb15971fba8/part5/contracts/echidna/LibraryMathEchidna.sol#L81-L114)
 
 ## "In-English" Invariants of the System
 Note: Implementations for these will be implemented in Part 6. 
@@ -42,6 +45,7 @@ Note: Implementations for these will be implemented in Part 6.
 
 **Inter-related Operations** 
 - A deposit and withdrawal should result in the same pre- and post-margin balances 
+
 ## Remove and Allocate
 **Engine Allocate** 
 - Liquidity chooses the minimum of the liquidity factors 

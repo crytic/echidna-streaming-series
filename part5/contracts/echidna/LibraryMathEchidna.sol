@@ -3,7 +3,7 @@ import "../libraries/Margin.sol";
 import "../libraries/Reserve.sol";
 import "../libraries/Units.sol";
 
-contract LibraryTest { 
+contract LibraryMathEchidna { 
 	using Units for uint256;
 	using Units for int128;
 	mapping (address => Margin.Data) private margins;
@@ -12,25 +12,6 @@ contract LibraryTest {
 	event LogUint256(string msg, uint256 value);
 	event AssertionFailed(string msg, uint256 expected, uint256 value);
 
-	// --------------------- Margins.sol -----------------------
-	function margin_deposit(uint256 riskyAmt, uint256 stableAmt) public {
-		uint256 preRisky = margin.balanceRisky;
-		uint256 preStable = margin.balanceStable;
-
-		Margin.deposit(margin, riskyAmt, stableAmt);
-		
-		assert(margin.balanceRisky - riskyAmt == preRisky);
-		assert(margin.balanceStable - stableAmt == preStable);
-	}
-	function margin_withdraw(uint256 riskyAmt, uint256 stableAmt) public {
-		uint256 preRisky = margin.balanceRisky;
-		uint256 preStable = margin.balanceStable;
-
-		Margin.withdraw(margins, riskyAmt, stableAmt);
-		
-		assert(margin.balanceRisky == preRisky - riskyAmt);
-		assert(margin.balanceStable == preStable - stableAmt);
-	}
 	// --------------------- Reserves.sol -----------------------	
 	Reserve.Data private reserve;
 	bool isSetup;
@@ -40,72 +21,92 @@ contract LibraryTest {
 		reserve.liquidity = 3 ether;
 		isSetup = true;
 	}
-	function reserve_allocate(uint256 delRisky, uint256 delStable) public returns (uint256, uint256, uint256, uint256){
+	function reserve_allocate(uint256 delRisky, uint256 delStable) public returns (Reserve.Data memory preAllocate, uint256 delLiquidity){
+		//************************* Pre-Conditions *************************/
 		if (!isSetup) { 
-			setupReserve();
+			setupReserve(); // set up the reserve with a starting value because delta liquidity value relies on non-zero reserves
 		}
-		uint256 preRisky = reserve.reserveRisky;
-		uint256 preStable = reserve.reserveStable;
-		uint256 preLiquidity = reserve.liquidity;
+		Reserve.Data memory preAllocateReserves; //save the pre-allocation reserve balances
 	
-		//blank copy from allocate function
-		uint256 liquidity0 = (delRisky * reserve.liquidity) / uint256(reserve.reserveRisky);
-        uint256 liquidity1 = (delStable * reserve.liquidity) / uint256(reserve.reserveStable);
-        uint256 delLiquidity = liquidity0 < liquidity1 ? liquidity0 : liquidity1;	
+		//************************* Action *************************/
+		uint256 liquidity0 = (delRisky * reserve.liquidity) / uint256(reserve.reserveRisky); // calculate the spot price on the risky token
+        uint256 liquidity1 = (delStable * reserve.liquidity) / uint256(reserve.reserveStable); // calculate the spot price on the stable token
+        uint256 delLiquidity = liquidity0 < liquidity1 ? liquidity0 : liquidity1; //choose min(risky spot, stable spot) for liquidity change
 		
-		Reserve.allocate(reserve,delRisky,delStable,delLiquidity,uint32(block.timestamp + 1000));
+		Reserve.allocate(reserve,delRisky,delStable,delLiquidity,uint32(block.timestamp + 1000)); // allocate to the reserve
 
-		assert(preRisky + delRisky == reserve.reserveRisky);
-		assert(preStable + delStable == reserve.reserveStable);
-		assert(preLiquidity + delLiquidity == reserve.liquidity);
+		//************************* Post-Conditions *************************/
+		/* Asserts: 
+		  - pre-allocation risky balance + risky amount allocated = post-allocation risky balance
+		  - pre-allocation stable balance + stable amount allocated = post-allocation stable balance 
+		  - pre-liquidity allocation + delta liquidity = post-allocation liquidity
+		*/
+		assert(preAllocateReserves.reserveRisky + delRisky == reserve.reserveRisky);
+		assert(preAllocateReserves.reserveStable + delStable == reserve.reserveStable);
+		assert(preAllocateReserves.liquidity + delLiquidity == reserve.liquidity);
 
-		return (preRisky, preStable, preLiquidity, delLiquidity);
+		return (preAllocateReserves, delLiquidity);
 	}
 	function reserve_remove(uint256 delLiquidity) public {
-		if (!isSetup) { 
-			setupReserve();
+		//************************* Pre-Conditions *************************/
+		if (!isSetup) {  
+			setupReserve(); // set up the reserve with starting value if it has not been started before
 		}		
-		delLiquidity = _between(delLiquidity, 1, type(uint64).max);		
-		uint256 preRisky = reserve.reserveRisky;
-		uint256 preStable = reserve.reserveStable;
-		uint256 preLiquidity = reserve.liquidity;
-		(uint256 delRisky, uint256 delStable) = Reserve.getAmounts(reserve,delLiquidity);		
+		// delLiquidity = _between(delLiquidity, 1, type(uint64).max);		
+		Reserve.Data memory preRemoveReserves; // save the pre-remove reserve balances
 		
-		Reserve.remove(reserve,delRisky,delStable,delLiquidity,uint32(block.timestamp + 1000));
+		//************************* Action *************************/
+		(uint256 delRisky, uint256 delStable) = Reserve.getAmounts(reserve,delLiquidity); // calculate the amount of risky and stable tokens the incoming liquidity maps to 
+		
+		Reserve.remove(reserve,delRisky,delStable,delLiquidity,uint32(block.timestamp + 1000)); // call Reserve.remove
 
-		assert(preRisky == reserve.reserveRisky + delRisky);
-		assert(preStable == reserve.reserveStable + delStable );
-		assert(preLiquidity == reserve.liquidity + delLiquidity);
+		//************************* Post-Conditions *************************/
+		/** Asserts: 
+			- pre-remove risky balance = current reserve.reserveRisky + risky amount removed
+			- pre-remove stable balance = current reserve.reserveRisky + risky amount stable
+			- pre-remove liquidity = current reserve.liquidity + deltaLiquidity
+		 */
+		assert(preRemoveReserves.reserveRisky == reserve.reserveRisky + delRisky);
+		assert(preRemoveReserves.reserveStable == reserve.reserveStable + delStable );
+		assert(preRemoveReserves.liquidity == reserve.liquidity + delLiquidity);
 	}
 
 	function allocate_then_remove(uint256 delRisky, uint256 delStable) public {
+		//************************* Pre-Conditions *************************/
 		delRisky = _between(delRisky, 1, type(uint64).max);
 		delStable = _between(delStable, 1, type(uint64).max);
 
 		emit LogUint256("delRisky", delRisky);
 		emit LogUint256("delStable", delStable);
 		
-		(uint256 preAllocateRisky, 
-		uint256 preAllocateStable, 
-		uint256 preAllocateLiquidity, 
+		//************************* Action *************************/
+		/**
+			- call reserve allocate, saving pre-allocat reserves and associated delLiquidity value 
+			- call reserve remove with delLiquidity from allocate
+		 */
+		(Reserve.Data memory preAllocateReserves,
 		uint256 delAllocateLiquidity
 		) = reserve_allocate(delRisky, delStable);
 
-		(uint256 delRemoveRisky, uint256 delRemoveStable) = Reserve.getAmounts(reserve, delAllocateLiquidity);
+		reserve_remove(delAllocateLiquidity);
 
-		Reserve.remove(reserve,delRemoveRisky,delRemoveStable,delAllocateLiquidity,uint32(block.timestamp + 1000));
+		//************************* Post-Conditions *************************/
+		/*
+			- pre-allocate reserveRisky = current (post-remove) reserveRisky
+			- pre-allocate reserveStable = current (post-remove) reserveStable 
+			- pre-allocate liquidity = current (post-remove) liquidity
+		*/
 		bool shouldFail;
-
-		if(preAllocateRisky != reserve.reserveRisky) { 
-			emit AssertionFailed("preallocate risky not equivalent to current risky", preAllocateRisky, reserve.reserveRisky);
+		if(preAllocateReserves.reserveRisky != reserve.reserveRisky) { 
+			emit AssertionFailed("preallocate risky not equivalent to current risky", preAllocateReserves.reserveRisky, reserve.reserveRisky);
 			shouldFail = true;
 		}
-		if(preAllocateStable  != reserve.reserveStable) {
-			emit AssertionFailed("preallocate stable not equivalent to current stable", preAllocateStable, reserve.reserveStable);
+		if(preAllocateReserves.reserveStable  != reserve.reserveStable) {
+			emit AssertionFailed("preallocate stable not equivalent to current stable", preAllocateReserves.reserveStable, reserve.reserveStable);
 			shouldFail = true;		
 		}
-		if(preAllocateLiquidity  != reserve.liquidity) {
-			emit AssertionFailed("preallocate liq not equivalent to current liq", preAllocateLiquidity, reserve.liquidity);
+		if(preAllocateReserves.liquidity  != reserve.liquidity) {
+			emit AssertionFailed("preallocate liq not equivalent to current liq", preAllocateReserves.liquidity, reserve.liquidity);
 			shouldFail = true;					
 		}
 		if (shouldFail) {
@@ -113,7 +114,7 @@ contract LibraryTest {
 		}
 	}
 
-	// // --------------------- Units.sol -----------------------
+	// --------------------- Units.sol -----------------------
 	function scaleUpAndScaleDownInverses(uint256 value, uint256 factor) public {
 		uint256 scaledFactor = (10e18+ factor % (10e18 + 1));
 
@@ -134,6 +135,25 @@ contract LibraryTest {
 		assert(scaledDownValue == value);
 	}
 
+	// --------------------- Margins.sol -----------------------
+	function margin_deposit(uint256 riskyAmt, uint256 stableAmt) public {
+		uint256 preRisky = margin.balanceRisky;
+		uint256 preStable = margin.balanceStable;
+
+		Margin.deposit(margin, riskyAmt, stableAmt);
+		
+		assert(margin.balanceRisky - riskyAmt == preRisky);
+		assert(margin.balanceStable - stableAmt == preStable);
+	}
+	function margin_withdraw(uint256 riskyAmt, uint256 stableAmt) public {
+		uint256 preRisky = margin.balanceRisky;
+		uint256 preStable = margin.balanceStable;
+
+		Margin.withdraw(margins, riskyAmt, stableAmt);
+		
+		assert(margin.balanceRisky == preRisky - riskyAmt);
+		assert(margin.balanceStable == preStable - stableAmt);
+	}
 
 	function _between(uint256 random, uint256 low, uint256 high) private returns (uint256) {
 		return low + random % (high-low);

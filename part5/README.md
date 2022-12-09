@@ -1,16 +1,12 @@
 # List of Invariants 
 
-## Tested 
-- [Deposit increases margin balances](https://github.com/crytic/echidna-streaming-series/blob/25a6367ea13343b95fc66e608ab6c9504780d801/part5/README.md#L4) – any call to `Margin.deposit` should increase the respective Margins.balances object 
-- [Withdrawals decrease margin balances](https://github.com/crytic/echidna-streaming-series/blob/1525cf004e6060d9a342e2946e8c3550b2e4bace/part5/contracts/echidna/LibraryMathEchidna.sol#L44-L52)
-- [Scale up and scale down are exact inverses](https://github.com/crytic/echidna-streaming-series/blob/1525cf004e6060d9a342e2946e8c3550b2e4bace/part5/contracts/echidna/LibraryMathEchidna.sol#L55-L62)
-- [Scale to X64 and from X64 are exact inverses](https://github.com/crytic/echidna-streaming-series/blob/1525cf004e6060d9a342e2946e8c3550b2e4bace/part5/contracts/echidna/LibraryMathEchidna.sol#L63-L73)
+## Invariants to test for Part 5: 
 - [Allocating to a pool increases its respective reserve balance](https://github.com/crytic/echidna-streaming-series/blob/9e1aca6efc057fd729d3c27145490fb15971fba8/part5/contracts/echidna/LibraryMathEchidna.sol#L43-L63)
 - [Removing from a pool decreases its respective reserve balance](https://github.com/crytic/echidna-streaming-series/blob/9e1aca6efc057fd729d3c27145490fb15971fba8/part5/contracts/echidna/LibraryMathEchidna.sol#L64-L79)
 - [Allocating then removing from a pool should result in the same pre- and post- balances](https://github.com/crytic/echidna-streaming-series/blob/9e1aca6efc057fd729d3c27145490fb15971fba8/part5/contracts/echidna/LibraryMathEchidna.sol#L81-L114)
 
 ## "In-English" Invariants of the System
-Note: Implementations for these will be implemented in Part 6. 
+Note: Implementations for these will be implemented in Part 6. Due to to time limitations, code for some of these will provided in Part 6 streams.
 
 **System Deployment**
 - PRECISION() constant = 10**18

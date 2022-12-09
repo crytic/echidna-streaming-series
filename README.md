@@ -31,7 +31,21 @@ Note that each workshop will be live streamed on Trail of Bits' [Twitch channel]
 this README when that time comes.
 - This repository will be updated as the series continues. Thus, there might be some incomplete folders / broken links in the process.
 
+# Try your own invariants! 
+
+**ABDK Math** 
+- Associative property of multiplication – `(x * y) * z = x * (y * z) `
+- Distributive property of multiplication – `x * (y + z) = (x * y) + (x * z) `
+- Multiplication of inverses (using the `inv` function) – `inv(x * y) = inv(x) * inv(y)`
+- Square roots – `sqrt(x) * sqrt(x) = x`
+- Logarithms – `log2(x * y) = log2(x) * log2(y)`
+- Average `gavg()`
+- Power `pow()`
+- Natural logarithm – `ln()`
+- Exponentiation – `exp()`
+
 # Echidna Installation
 
 - Download [relevant binaries for your system](https://github.com/crytic/echidna/releases/tag/v2.0.4) 
 - Add to PATH* (All commands in respective README documents assume `echidna-test` refers to the binary) 
+

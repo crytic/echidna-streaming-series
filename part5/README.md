@@ -55,3 +55,7 @@ Note: Implementations for these will be implemented in Part 6. Due to to time li
 ```
 npx hardhat clean && npx hardhat compile && echidna-test . --contract LibraryMathEchidna --corpus-dir  corpus --test-mode assertion
 ```
+
+**Configuration Options**:
+- `--corpus-dir` is used to specify the directory to save the corpus 
+- `--test-mode assertion` specifies echidna to search for `assert()` statements in their codebase

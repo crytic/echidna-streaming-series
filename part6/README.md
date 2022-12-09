@@ -1,5 +1,10 @@
 # Run Echidna 
 
+```
+npx hardhat clean && npx hardhat compile && echidna-test . --contract EchidnaE2E --config contracts/crytic/E2ECore.yaml
+
+```
+
 ## E2E Setup
 
 Note: This only needs to be done when the target code *changes*.

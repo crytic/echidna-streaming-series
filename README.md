@@ -44,6 +44,13 @@ this README when that time comes.
 - Natural logarithm – `ln()`
 - Exponentiation – `exp()`
 
+**Uniswap V2**
+- Path independence for swaps
+- Pool invariant always increases
+- LP tokens are minted differently based on existing pool liquidity 
+- An LP provider's underlying asset balances are monotonically increasing
+- Path independence for LPs
+
 # Echidna Installation
 
 - Download [relevant binaries for your system](https://github.com/crytic/echidna/releases/tag/v2.0.4) 

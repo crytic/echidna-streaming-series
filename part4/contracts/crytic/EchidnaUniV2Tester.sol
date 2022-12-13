@@ -12,8 +12,10 @@ contract EchidnaUniV2Tester is Setup {
             _init(amount1,amount2);
         }
         
-        uint pairBalanceBefore = testPair.balanceOf(address(user));
-        
+        //uint pairBalanceBefore = testPair.balanceOf(address(user));
+        ( ,bytes memory balanceDataBefore) = user.proxy(pair, abi.encodeWithSignature("balanceOf(address)", address(user)));  //pair.balanceOf(address(user));
+        uint pairBalanceBefore = abi.decode(balanceDataBefore, (uint));
+
         (uint reserve1Before, uint reserve2Before) = UniswapV2Library.getReserves(address(factory), address(testToken1), address(testToken2));
         
         uint kBefore = reserve1Before * reserve2Before;
@@ -26,8 +28,12 @@ contract EchidnaUniV2Tester is Setup {
        
         if (success) {
             (uint reserve1After, uint reserve2After) = UniswapV2Library.getReserves(address(factory), address(testToken1), address(testToken2));
-            uint pairBalanceAfter = testPair.balanceOf(address(user));
+
+            //uint pairBalanceAfter = testPair.balanceOf(address(user));
+            (, bytes memory balanceDataAfter) = user.proxy(pair, abi.encodeWithSignature("balanceOf(address)", address(user)));  //pair.balanceOf(address(user));
+            uint pairBalanceAfter= abi.decode(balanceDataAfter, (uint));
             uint kAfter = reserve1After*reserve2After;
+
             assert(kBefore < kAfter);
             assert(pairBalanceBefore < pairBalanceAfter);
         }
@@ -75,7 +81,9 @@ contract EchidnaUniV2Tester is Setup {
     function testRemoveLiquidityInvariants(uint lpAmount) public {
         //PRECONDITIONS:
 
-        uint pairBalanceBefore = testPair.balanceOf(address(user));
+        //uint pairBalanceBefore = testPair.balanceOf(address(user));
+        ( ,bytes memory balanceDataBefore) = user.proxy(pair, abi.encodeWithSignature("balanceOf(address)", address(user)));  //pair.balanceOf(address(user));
+        uint pairBalanceBefore = abi.decode(balanceDataBefore, (uint));
         //user needs some LP tokens to burn
         require(pairBalanceBefore > 0);
         lpAmount = _between(lpAmount, 1, pairBalanceBefore);
@@ -83,7 +91,8 @@ contract EchidnaUniV2Tester is Setup {
         (uint reserve1Before, uint reserve2Before) = UniswapV2Library.getReserves(address(factory), address(testToken1), address(testToken2));
         //need to provide more than min liquidity
         uint kBefore = reserve1Before * reserve2Before;
-       (bool success1,) = user.proxy(address(testPair),abi.encodeWithSelector(testPair.approve.selector,address(router),uint(-1)));
+        //(bool success1,) = user.proxy(testPair,abi.encodeWithSelector(testPair.approve.selector,address(router),uint(-1)));
+        (bool success1,) = user.proxy(address(pair), abi.encodeWithSignature("approve(address,uint256)", address(router),uint(-1)));
         require(success1);
         //CALL:
 
@@ -94,7 +103,11 @@ contract EchidnaUniV2Tester is Setup {
         
         if (success) {
             (uint reserve1After, uint reserve2After) = UniswapV2Library.getReserves(address(factory), address(testToken1), address(testToken2));
-            uint pairBalanceAfter = testPair.balanceOf(address(user));
+            
+            //uint pairBalanceAfter = testPair.balanceOf(address(user));
+            (, bytes memory balanceDataAfter) = user.proxy(pair, abi.encodeWithSignature("balanceOf(address)", address(user)));  //pair.balanceOf(address(user));
+            uint pairBalanceAfter= abi.decode(balanceDataAfter, (uint));
+
             uint kAfter = reserve1After*reserve2After;
             assert(kBefore > kAfter);
             assert(pairBalanceBefore > pairBalanceAfter);

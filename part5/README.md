@@ -53,7 +53,7 @@ Note: Implementations for these will be implemented in Part 6. Due to to time li
 ## Running Code (for Part 5)
 
 ```
-npx hardhat clean && npx hardhat compile && echidna-test . --contract LibraryMathEchidna --corpus-dir  corpus --test-mode assertion
+rm -rf cache artifacts && echidna-test . --contract LibraryMathEchidna --corpus-dir  corpus --test-mode assertion --format text 
 ```
 
 **Configuration Options**:

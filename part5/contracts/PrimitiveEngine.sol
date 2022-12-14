@@ -190,7 +190,7 @@ contract PrimitiveEngine is IPrimitiveEngine {
         reserves[poolId].allocate(delRisky, delStable, delLiquidity, cal.lastTimestamp); // state update
 
         (uint256 balRisky, uint256 balStable) = (balanceRisky(), balanceStable());
-        IPrimitiveCreateCallback(msg.sender).createCallback(delRisky, delStable, data);
+        IPrimitiveCreateCallback(msg.sender).createCallback(delRisky, delStable, data); // callback executes transfers to the engine
         checkRiskyBalance(balRisky + delRisky);
         checkStableBalance(balStable + delStable);
 
@@ -236,33 +236,33 @@ contract PrimitiveEngine is IPrimitiveEngine {
 
     /// @inheritdoc IPrimitiveEngineActions
     function allocate(
-        bytes32 poolId,
-        address recipient,
-        uint256 delRisky,
-        uint256 delStable,
-        bool fromMargin,
-        bytes calldata data
+        bytes32 poolId, //E2E INVARIANT: assume a pool already exists
+        address recipient, //specify the recipient's liquidity to increase
+        uint256 delRisky,// amount of risky to allocate into the pool
+        uint256 delStable,// amount of stable to allocate into the pool
+        bool fromMargin, // whether to take from the margins[] amount (i.e: has a user deposited in the past)?
+        bytes calldata data // calldata to be used on the allocate (optional)
     ) external override lock returns (uint256 delLiquidity) {
-        if (delRisky == 0 || delStable == 0) revert ZeroDeltasError();
-        Reserve.Data storage reserve = reserves[poolId];
-        if (reserve.blockTimestamp == 0) revert UninitializedError();
-        uint32 timestamp = _blockTimestamp();
+        if (delRisky == 0 || delStable == 0) revert ZeroDeltasError(); //@note INVARIANT: Ensure the amount of both tokens are non-zero 
+        Reserve.Data storage reserve = reserves[poolId]; // retrieve reserves for a specific pool 
+        if (reserve.blockTimestamp == 0) revert UninitializedError(); //@note INVARIANT E2E: A pool must exist before you can allocate to it 
+        uint32 timestamp = _blockTimestamp(); 
 
-        uint256 liquidity0 = (delRisky * reserve.liquidity) / uint256(reserve.reserveRisky);
-        uint256 liquidity1 = (delStable * reserve.liquidity) / uint256(reserve.reserveStable);
-        delLiquidity = liquidity0 < liquidity1 ? liquidity0 : liquidity1;
-        if (delLiquidity == 0) revert ZeroLiquidityError();
+        uint256 liquidity0 = (delRisky * reserve.liquidity) / uint256(reserve.reserveRisky); // calculate the risky spot price 
+        uint256 liquidity1 = (delStable * reserve.liquidity) / uint256(reserve.reserveStable); // calculate the stable spot price
+        delLiquidity = liquidity0 < liquidity1 ? liquidity0 : liquidity1; // the change in liquidity to add to a reserve = min (risky spot price, stable spot price);
+        if (delLiquidity == 0) revert ZeroLiquidityError(); // @note INVARIANT: delta liquidity needs to be >0.
 
-        liquidity[recipient][poolId] += delLiquidity; // increase position liquidity
-        reserve.allocate(delRisky, delStable, delLiquidity, timestamp); // increase reserves and liquidity
+        liquidity[recipient][poolId] += delLiquidity; // @note INVARIANT E2E: increase the liquidity amount for the pool 
+        reserve.allocate(delRisky, delStable, delLiquidity, timestamp); //@note INVARIANT: increase reserves and liquidity amounts for the pool
 
-        if (fromMargin) {
-            margins.withdraw(delRisky, delStable); // removes tokens from `msg.sender` margin account
-        } else {
-            (uint256 balRisky, uint256 balStable) = (balanceRisky(), balanceStable());
-            IPrimitiveLiquidityCallback(msg.sender).allocateCallback(delRisky, delStable, data); // agnostic payment
-            checkRiskyBalance(balRisky + delRisky);
-            checkStableBalance(balStable + delStable);
+        if (fromMargin) { // if the user wants to allocate to a pool from a margin
+            margins.withdraw(delRisky, delStable); // then, remove tokens from `msg.sender` margin account
+        } else { //otherwise, rely on a transfer
+            (uint256 balRisky, uint256 balStable) = (balanceRisky(), balanceStable()); 
+            IPrimitiveLiquidityCallback(msg.sender).allocateCallback(delRisky, delStable, data); // rely on a callback to transfer tokens 
+            checkRiskyBalance(balRisky + delRisky); // ensure that the right amuont of delRisky tokens were sent
+            checkStableBalance(balStable + delStable); //ensure that the right amount of delStable tokens were sent
         }
 
         emit Allocate(msg.sender, recipient, poolId, delRisky, delStable, delLiquidity);
@@ -275,14 +275,14 @@ contract PrimitiveEngine is IPrimitiveEngine {
         lock
         returns (uint256 delRisky, uint256 delStable)
     {
-        if (delLiquidity == 0) revert ZeroLiquidityError();
-        Reserve.Data storage reserve = reserves[poolId];
-        if (reserve.blockTimestamp == 0) revert UninitializedError();
-        (delRisky, delStable) = reserve.getAmounts(delLiquidity);
+        if (delLiquidity == 0) revert ZeroLiquidityError(); //@note INVARIANT: the change in liquidity must be > 0
+        Reserve.Data storage reserve = reserves[poolId]; 
+        if (reserve.blockTimestamp == 0) revert UninitializedError(); //@note INVARIANT E2E: the pool must exist
+        (delRisky, delStable) = reserve.getAmounts(delLiquidity); // calculates the amount of risky and stable in exchange for liquidity
 
-        liquidity[msg.sender][poolId] -= delLiquidity; // state update
-        reserve.remove(delRisky, delStable, delLiquidity, _blockTimestamp());
-        margins[msg.sender].deposit(delRisky, delStable);
+        liquidity[msg.sender][poolId] -= delLiquidity; // decrease the amount of liquidity associated to a pool
+        reserve.remove(delRisky, delStable, delLiquidity, _blockTimestamp()); //@note INVARIANT: risky, stable, liquidity amounts for a pool should decrease by respective amounts
+        margins[msg.sender].deposit(delRisky, delStable); //@note INVARIANT: margins for the msg.sender should increase
 
         emit Remove(msg.sender, poolId, delRisky, delStable, delLiquidity);
     }

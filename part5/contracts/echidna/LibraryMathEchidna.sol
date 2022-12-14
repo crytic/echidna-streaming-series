@@ -3,17 +3,18 @@ import "../libraries/Reserve.sol";
 
 contract LibraryMathEchidna { 
 	event LogUint256(string msg, uint256 value);
-	event AssertionFailed(string msg, uint256 expected, uint256 value);
+	event AssertionFailed(string msg, uint256 expected, uint256 value); 
 
 	// --------------------- Reserves.sol -----------------------	
 	Reserve.Data private reserve;
-	bool isSetup;
+	bool isSetup; // ifSetup false -> reserve(0,0,...,0,0); otherwise setupReserve();
 	function setupReserve() private {
 		reserve.reserveRisky = 1 ether;
 		reserve.reserveStable = 2 ether;
 		reserve.liquidity = 3 ether;
 		isSetup = true;
 	}
+	//"safe"-version of reserve_allocate
 	function reserve_allocate(uint256 delRisky, uint256 delStable) public returns (Reserve.Data memory preAllocate, uint256 delLiquidity){
 		//************************* Pre-Conditions *************************/
 		if (!isSetup) { 
@@ -42,8 +43,7 @@ contract LibraryMathEchidna {
 		//************************* Pre-Conditions *************************/
 		if (!isSetup) {  
 			setupReserve(); // set up the reserve with starting value if it has not been started before
-		}		
-		// delLiquidity = _between(delLiquidity, 1, type(uint64).max);		
+		}	
 		Reserve.Data memory preRemoveReserves = reserve; // save the pre-remove reserve balances
 		
 		//************************* Action *************************/
@@ -62,7 +62,7 @@ contract LibraryMathEchidna {
 
 	function allocate_then_remove(uint256 delRisky, uint256 delStable) public {
 		//************************* Pre-Conditions *************************/
-		// bound the incoming inputs 
+		// bound the risky and stable amounts to between 1-uint64.max
 		delRisky = _between(delRisky, 1, type(uint64).max);
 		delStable = _between(delStable, 1, type(uint64).max);
 

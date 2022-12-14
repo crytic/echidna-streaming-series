@@ -75,15 +75,15 @@ library Reserve {
     /// @param  blockTimestamp  Timestamp used to update cumulative reserves
     function allocate(
         Data storage reserve,
-        uint256 delRisky,
+        uint256 delRisky, // uint256 argument
         uint256 delStable,
         uint256 delLiquidity,
         uint32 blockTimestamp
     ) internal {
-        update(reserve, blockTimestamp);
-        reserve.reserveRisky += delRisky.toUint128();
-        reserve.reserveStable += delStable.toUint128();
-        reserve.liquidity += delLiquidity.toUint128();
+        update(reserve, blockTimestamp); // skip update
+        reserve.reserveRisky += delRisky.toUint128(); // reserveRisky should increase; downcasting 128() 
+        reserve.reserveStable += delStable.toUint128(); // reserveStable should increase
+        reserve.liquidity += delLiquidity.toUint128(); // liquidity should increase
     }
 
     /// @notice                 Remove from both reserves and total supply of liquidity

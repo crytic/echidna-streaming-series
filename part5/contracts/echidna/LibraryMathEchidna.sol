@@ -2,26 +2,32 @@ pragma solidity 0.8.6;
 import "../libraries/Reserve.sol";
 
 contract LibraryMathEchidna { 
-	event LogUint256(string msg, uint256 value);
-	event AssertionFailed(string msg, uint256 expected, uint256 value); 
-
-	// --------------------- Reserves.sol -----------------------	
-	Reserve.Data private reserve;
-	bool isSetup; // ifSetup false -> reserve(0,0,...,0,0); otherwise setupReserve();
+	Reserve.Data private reserve; // (0,0,0,0,0,0,0)
+	event LogUint256(string msg, uint256);
+	event AssertionFailed(string msg, uint256 expected, uint256 actualValue);
+	bool isSetup;
 	function setupReserve() private {
 		reserve.reserveRisky = 1 ether;
 		reserve.reserveStable = 2 ether;
 		reserve.liquidity = 3 ether;
 		isSetup = true;
 	}
-	//"safe"-version of reserve_allocate
-	function reserve_allocate(uint256 delRisky, uint256 delStable) public returns (Reserve.Data memory preAllocate, uint256 delLiquidity){
+	//"safe"-version of reserve_allocate (1-uint128.max)
+	function reserve_allocate(uint256 delRisky, uint256 delStable) public returns (Reserve.Data memory preAllocateReserves, uint256 delLiquidity){
 		//************************* Pre-Conditions *************************/
-		if (!isSetup) { 
-			setupReserve(); // set up the reserve with a starting value because delta liquidity value relies on non-zero reserves
-		}
-		Reserve.Data memory preAllocateReserves = reserve; //save the pre-allocation reserve balances
-	
+		//@note PRECONDITION: isSetup has to be true (0,0,...,0)
+		if (!isSetup) setupReserve();
+		//@note INVARIANT: delRisky, delStable need to be >0 
+		// | **1 - uint128**  | uint128-uint256 |
+		// @note INVARIANT: delta liquidity needs to be >0.
+		emit LogUint256("reserve.liquidity",reserve.liquidity);
+		emit LogUint256("reserve.reserveRisky",reserve.reserveRisky);
+        uint256 liquidity0 = (delRisky * reserve.liquidity) / uint256(reserve.reserveRisky); // calculate the risky token spot price 
+        uint256 liquidity1 = (delStable * reserve.liquidity) / uint256(reserve.reserveStable); // calculate the stable token spot price
+        delLiquidity = liquidity0 < liquidity1 ? liquidity0 : liquidity1; // min(risky,stable)
+		// snapshot the pool 
+		preAllocateReserves= reserve; 
+
 		//************************* Action *************************/
 		uint256 liquidity0 = (delRisky * reserve.liquidity) / uint256(reserve.reserveRisky); // calculate the spot price on the risky token
         	uint256 liquidity1 = (delStable * reserve.liquidity) / uint256(reserve.reserveStable); // calculate the spot price on the stable token
@@ -30,22 +36,21 @@ contract LibraryMathEchidna {
 		Reserve.allocate(reserve,delRisky,delStable,delLiquidity,uint32(block.timestamp + 1000)); // allocate to the reserve
 
 		//************************* Post-Conditions *************************/
-		// pre-allocation risky balance + risky amount allocated = post-allocation risky balance
+		// snapshot the pool  – "reserve" 
+		// pre-allocate reserve reserveRisky + amt risky added (delRisky) ==  post-allocate reserveRisky amount
 		assert(preAllocateReserves.reserveRisky + delRisky == reserve.reserveRisky);
-		// pre-allocation stable balance + stable amount allocated = post-allocation stable balance
+		// pre-allocate reserve reserveStable + amt stable added (delStable) ==  post-allocate reserveStable amount
 		assert(preAllocateReserves.reserveStable + delStable == reserve.reserveStable);
-		// pre-liquidity allocation + delta liquidity = post-allocation liquidity
+		// pre-allocate reserve liquidity + delLiquidity (delLiquidity) ==  post-allocate liquidity
 		assert(preAllocateReserves.liquidity + delLiquidity == reserve.liquidity);
-
-		return (preAllocateReserves, delLiquidity);
 	}
 	function reserve_remove(uint256 delLiquidity) public {
 		//************************* Pre-Conditions *************************/
 		if (!isSetup) {  
 			setupReserve(); // set up the reserve with starting value if it has not been started before
 		}	
-		Reserve.Data memory preRemoveReserves = reserve; // save the pre-remove reserve balances
-		
+		Reserve.Data memory preRemoveReserves = reserve; // save the pre-remove reserve balances		
+
 		//************************* Action *************************/
 		(uint256 delRisky, uint256 delStable) = Reserve.getAmounts(reserve,delLiquidity); // calculate the amount of risky and stable tokens the incoming liquidity maps to 
 		
@@ -57,29 +62,27 @@ contract LibraryMathEchidna {
 		// pre-remove stable balance = current reserve.reserveRisky + risky amount stable
 		assert(preRemoveReserves.reserveStable == reserve.reserveStable + delStable );
 		// pre-remove liquidity = current reserve.liquidity + deltaLiquidity
-		assert(preRemoveReserves.liquidity == reserve.liquidity + delLiquidity);
+		assert(preRemoveReserves.liquidity == reserve.liquidity + delLiquidity);		
 	}
 
 	function allocate_then_remove(uint256 delRisky, uint256 delStable) public {
 		//************************* Pre-Conditions *************************/
-		// bound the risky and stable amounts to between 1-uint64.max
-		delRisky = _between(delRisky, 1, type(uint64).max);
-		delStable = _between(delStable, 1, type(uint64).max);
-
-		// if an assertion fails, print out the delRisky and delStable values (as the actual args may not be equivalent to the incoming args)
-		emit LogUint256("delRisky", delRisky);
-		emit LogUint256("delStable", delStable);
+		delRisky = _between(delRisky, 1, type(uint64).max); 
+		delStable = _between(delStable, 1, type(uint64).max); 
 		
+		emit LogUint256("delRisky", uint256(delRisky));
+		emit LogUint256("delStable", uint256(delStable));
+
 		//************************* Action *************************/
-		// call reserve allocate, saving pre-allocate reserves and associated delLiquidity value 
-		(Reserve.Data memory preAllocateReserves, uint256 delAllocateLiquidity) = reserve_allocate(delRisky, delStable);
-		// call reserve remove with delLiquidity from allocate
-		reserve_remove(delAllocateLiquidity);
+		// this gives us the snapshot of pre-allocate reserves, 
+		(Reserve.Data memory preAllocateReserves, uint256 delAllocateLiquidity) = 
+			reserve_allocate(delRisky, delStable); // this allocates to the pool, this ensures reserve balance increases
+		reserve_remove(delAllocateLiquidity); // this removes funds from the pool, ensures the balance decreases 
 
 		//************************* Post-Conditions *************************/
-		// pre-allocate reserveRisky = current (post-remove) reserveRisky
-		if(preAllocateReserves.reserveRisky != reserve.reserveRisky) { 
-			emit AssertionFailed("preallocate risky not equivalent to current risky", preAllocateReserves.reserveRisky, reserve.reserveRisky);
+		// snapshot (pre-allocate).reserveRisky = current reserveRisky
+		if(preAllocateReserves.reserveRisky != reserve.reserveRisky) {
+			emit AssertionFailed("reserveRisky not equal",preAllocateReserves.reserveRisky,reserve.reserveRisky);
 		}
 		// pre-allocate reserveStable = current (post-remove) reserveStable 
 		if(preAllocateReserves.reserveStable  != reserve.reserveStable) {

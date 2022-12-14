@@ -143,7 +143,7 @@ contract PrimitiveEngine is IPrimitiveEngine {
 
     /// @inheritdoc IPrimitiveEngineActions
     function create(
-        uint128 strike,
+        uint128 strike, // match whitepaper directly
         uint32 sigma,
         uint32 maturity,
         uint32 gamma,
@@ -187,11 +187,11 @@ contract PrimitiveEngine is IPrimitiveEngine {
         calibrations[poolId] = cal; // state update
         uint256 amount = delLiquidity - MIN_LIQUIDITY;
         liquidity[msg.sender][poolId] += amount; // burn min liquidity, at cost of msg.sender
-        reserves[poolId].allocate(delRisky, delStable, delLiquidity, cal.lastTimestamp); // state update
+        reserves[poolId].allocate(delRisky, delStable, delLiquidity, cal.lastTimestamp); // allocate risky, stable to reserve
 
         (uint256 balRisky, uint256 balStable) = (balanceRisky(), balanceStable());
-        IPrimitiveCreateCallback(msg.sender).createCallback(delRisky, delStable, data); // callback executes transfers to the engine
-        checkRiskyBalance(balRisky + delRisky);
+        IPrimitiveCreateCallback(msg.sender).createCallback(delRisky, delStable, data); // assumption: callback executes transfers to the engine
+        checkRiskyBalance(balRisky + delRisky); // 
         checkStableBalance(balStable + delStable);
 
         emit Create(msg.sender, cal.strike, cal.sigma, cal.maturity, cal.gamma, delRisky, delStable, amount);
@@ -202,11 +202,11 @@ contract PrimitiveEngine is IPrimitiveEngine {
     /// @inheritdoc IPrimitiveEngineActions
     function deposit(
         address recipient,
-        uint256 delRisky,
-        uint256 delStable,
+        uint256 delRisky, // "amount of risky token to be deposited into engine"
+        uint256 delStable, // "amount of stable token to be deposited" 
         bytes calldata data
     ) external override lock {
-        if (delRisky == 0 && delStable == 0) revert ZeroDeltasError();
+        if (delRisky == 0 && delStable == 0) revert ZeroDeltasError(); 
         margins[recipient].deposit(delRisky, delStable); // state update
 
         uint256 balRisky;
@@ -243,14 +243,14 @@ contract PrimitiveEngine is IPrimitiveEngine {
         bool fromMargin, // whether to take from the margins[] amount (i.e: has a user deposited in the past)?
         bytes calldata data // calldata to be used on the allocate (optional)
     ) external override lock returns (uint256 delLiquidity) {
-        if (delRisky == 0 || delStable == 0) revert ZeroDeltasError(); //@note INVARIANT: Ensure the amount of both tokens are non-zero 
+        if (delRisky == 0 || delStable == 0) revert ZeroDeltasError(); //@note INVARIANT: delRisky, delStable need to be >0 
         Reserve.Data storage reserve = reserves[poolId]; // retrieve reserves for a specific pool 
-        if (reserve.blockTimestamp == 0) revert UninitializedError(); //@note INVARIANT E2E: A pool must exist before you can allocate to it 
+        if (reserve.blockTimestamp == 0) revert UninitializedError(); //@note INVARIANT E2E: A pool must exist ("create()")before you can allocate to it 
         uint32 timestamp = _blockTimestamp(); 
 
-        uint256 liquidity0 = (delRisky * reserve.liquidity) / uint256(reserve.reserveRisky); // calculate the risky spot price 
-        uint256 liquidity1 = (delStable * reserve.liquidity) / uint256(reserve.reserveStable); // calculate the stable spot price
-        delLiquidity = liquidity0 < liquidity1 ? liquidity0 : liquidity1; // the change in liquidity to add to a reserve = min (risky spot price, stable spot price);
+        uint256 liquidity0 = (delRisky * reserve.liquidity) / uint256(reserve.reserveRisky); // calculate the risky token spot price 
+        uint256 liquidity1 = (delStable * reserve.liquidity) / uint256(reserve.reserveStable); // calculate the stable token spot price
+        delLiquidity = liquidity0 < liquidity1 ? liquidity0 : liquidity1; // min(risky,stable)
         if (delLiquidity == 0) revert ZeroLiquidityError(); // @note INVARIANT: delta liquidity needs to be >0.
 
         liquidity[recipient][poolId] += delLiquidity; // @note INVARIANT E2E: increase the liquidity amount for the pool 

@@ -81,7 +81,7 @@ contract EchidnaPrimitiveEngine is IPrimitiveEngine {
     }
 
     /// @notice Deploys an Engine with two tokens, a 'Risky' and 'Stable'
-    constructor(address _risky, address _stable, uint256 _scaleFactorRisky, uint256 _scaleFactorStable, uint256 _min_liquidity) {
+    constructor(address _risky, address _stable, uint256 _scaleFactorRisky, uint256 _scaleFactorStable, uint256 _min_liquidity) { 
         risky = _risky;
         stable = _stable;
         scaleFactorRisky = _scaleFactorRisky;
@@ -193,7 +193,7 @@ contract EchidnaPrimitiveEngine is IPrimitiveEngine {
         reserves[poolId].allocate(delRisky, delStable, delLiquidity, cal.lastTimestamp); // state update
 
         (uint256 balRisky, uint256 balStable) = (balanceRisky(), balanceStable());
-        IPrimitiveCreateCallback(msg.sender).createCallback(delRisky, delStable, data);
+        IPrimitiveCreateCallback(msg.sender).createCallback(delRisky, delStable, data); // target contract has a callback; risky,stable.transfer from: sender, to: engine, amount
         checkRiskyBalance(balRisky + delRisky);
         checkStableBalance(balStable + delStable);
 
@@ -204,35 +204,35 @@ contract EchidnaPrimitiveEngine is IPrimitiveEngine {
 
     /// @inheritdoc IPrimitiveEngineActions
     function deposit(
-        address recipient,
-        uint256 delRisky,
-        uint256 delStable,
-        bytes calldata data
+        address recipient, // who's margins you want to deposit to 
+        uint256 delRisky, // ∆ risky tokens, deposit amounts
+        uint256 delStable, // ∆ stable, deposit amounts
+        bytes calldata data // ignore value; being forwarded to the callback 
     ) external override lock {
-        if (delRisky == 0 && delStable == 0) revert ZeroDeltasError();
-        margins[recipient].deposit(delRisky, delStable); // state update
+        if (delRisky == 0 && delStable == 0) revert ZeroDeltasError(); // INVARIANT: amt to deposit of both tokens = 0 
+        margins[recipient].deposit(delRisky, delStable); // state update – increase the margins[recipient] for all users 
 
-        uint256 balRisky;
+        uint256 balRisky; 
         uint256 balStable;
-        if (delRisky != 0) balRisky = balanceRisky();
-        if (delStable != 0) balStable = balanceStable();
-        IPrimitiveDepositCallback(msg.sender).depositCallback(delRisky, delStable, data); // agnostic payment
-        if (delRisky != 0) checkRiskyBalance(balRisky + delRisky);
-        if (delStable != 0) checkStableBalance(balStable + delStable);
+        if (delRisky != 0) balRisky = balanceRisky(); // retrieve the amount of risky tokens  a user has before callback
+        if (delStable != 0) balStable = balanceStable(); // retrieve the amount of stable tokens a user has before callback 
+        IPrimitiveDepositCallback(msg.sender).depositCallback(delRisky, delStable, data); // execute callback, forwarding `data` to the callback
+        if (delRisky != 0) checkRiskyBalance(balRisky + delRisky); // ensure post-withdraw risky balance of engine == pre-withdraw risky balance + delRisky
+        if (delStable != 0) checkStableBalance(balStable + delStable); // ensure post-withdraw stable balance of engine == pre-withdraw stable balance + delStable 
         emit Deposit(msg.sender, recipient, delRisky, delStable);
     }
 
     /// @inheritdoc IPrimitiveEngineActions
     function withdraw(
-        address recipient,
-        uint256 delRisky,
-        uint256 delStable
+        address recipient, // who's margin to withdraw to 
+        uint256 delRisky, // ∆ risky tokens, withdraw amounts
+        uint256 delStable // ∆ stable tokens, withdraw amounts
     ) external override lock {
-        if (delRisky == 0 && delStable == 0) revert ZeroDeltasError();
-        margins.withdraw(delRisky, delStable); // state update
-        if (delRisky != 0) IERC20(risky).safeTransfer(recipient, delRisky);
-        if (delStable != 0) IERC20(stable).safeTransfer(recipient, delStable);
-        emit Withdraw(msg.sender, recipient, delRisky, delStable);
+        if (delRisky == 0 && delStable == 0) revert ZeroDeltasError(); // INVARIANT: amt to deposit of both tokens = 0
+        margins.withdraw(delRisky, delStable); // state update – deduct ∆ risky and ∆ stable from sender margins
+        if (delRisky != 0) IERC20(risky).safeTransfer(recipient, delRisky); // transfer delRisky tokens to recipient
+        if (delStable != 0) IERC20(stable).safeTransfer(recipient, delStable); // transfer delStable tokens to recipient
+        emit Withdraw(msg.sender, recipient, delRisky, delStable); // Emit withdrawal event
     }
 
     // ===== Liquidity =====

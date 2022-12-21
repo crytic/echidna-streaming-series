@@ -23,8 +23,8 @@ library Margin {
         uint256 delRisky,
         uint256 delStable
     ) internal {
-        if (delRisky != 0) margin.balanceRisky += delRisky.toUint128();
-        if (delStable != 0) margin.balanceStable += delStable.toUint128();
+        if (delRisky != 0) margin.balanceRisky += delRisky.toUint128(); // margin.balanceRisky should increase
+        if (delStable != 0) margin.balanceStable += delStable.toUint128(); //margin.balanceStable should increase
     }
 
     /// @notice             Removes risky and stable token balance from `msg.sender`'s internal margin account
@@ -33,12 +33,12 @@ library Margin {
     /// @param  delStable   Amount of stable tokens to subtract from margin
     /// @return margin      Data storage of a margin account
     function withdraw(
-        mapping(address => Data) storage margins,
+        mapping(address => Data) storage margins, 
         uint256 delRisky,
         uint256 delStable
     ) internal returns (Data storage margin) {
-        margin = margins[msg.sender];
-        if (delRisky != 0) margin.balanceRisky -= delRisky.toUint128();
-        if (delStable != 0) margin.balanceStable -= delStable.toUint128();
+        margin = margins[msg.sender]; // retrieve margins of msg.sender 
+        if (delRisky != 0) margin.balanceRisky -= delRisky.toUint128(); // decrease the balanceRisky amount
+        if (delStable != 0) margin.balanceStable -= delStable.toUint128(); // decrease the balanceStable amount 
     }
 }

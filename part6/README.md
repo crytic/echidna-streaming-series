@@ -1,8 +1,13 @@
+## Writing Tests 
+
+1. Unzip the corpus.zip file 
+2. Update addresses in the E2E Contract
+3. Start writing assertion properties 
+
 # Run Echidna 
 
 ```
-npx hardhat clean && npx hardhat compile && echidna-test . --contract EchidnaE2E --config contracts/crytic/E2ECore.yaml
-
+rm -rf crytic-compile artifacts cache && echidna-test . --contract EchidnaE2E --config contracts/crytic/E2ECore.yaml
 ```
 
 ## E2E Setup

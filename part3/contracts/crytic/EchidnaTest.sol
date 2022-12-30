@@ -3,6 +3,7 @@ pragma solidity ^0.6.0;
 import "./Setup.sol";
 
 contract EchidnaTest is Setup {
+
     function testProvideLiquidity(uint amount1, uint amount2) public {
         // Pre-conditions:
         amount1 = _between(amount1, 1000, uint(-1));
@@ -43,11 +44,10 @@ contract EchidnaTest is Setup {
         require(pair.balanceOf(address(user)) > 0);
 
         // Action:
-        (bool success, bytes memory res) = user.proxy(address(pair), abi.encodeWithSelector(pair.swap.selector, amount1, amount2, address(user), ""));
+        (bool success,) = user.proxy(address(pair), abi.encodeWithSelector(pair.swap.selector, amount1, amount2, address(user), ""));
 
         // Post-condition:
         assert(!success);
-        string memory _revertMsg = abi.decode(res.slice(4, res.length - 4), (string));
-        assert(_revertMsg == "UniswapV2: INSUFFICIENT_LIQUIDITY");
     }
+
 }

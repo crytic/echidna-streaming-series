@@ -13,7 +13,7 @@ contract EchidnaTest is Setup {
         }
         //// State before
         uint lpTokenBalanceBefore = pair.balanceOf(address(user));
-        (uint reserve0Before, uint reserve1Before) = pair.getReserves();
+        (uint reserve0Before, uint reserve1Before,) = pair.getReserves();
         uint kBefore = reserve0Before * reserve1Before;
         //// Transfer tokens to UniswapV2Pair contract
         (bool success1,) = user.proxy(address(testToken1), abi.encodeWithSelector(testToken1.transfer.selector, address(pair), amount1));
@@ -26,7 +26,7 @@ contract EchidnaTest is Setup {
         // Post-conditions:
         if (success3) {
             uint lpTokenBalanceAfter = pair.balanceOf(address(user));
-            (uint reserve0After, uint reserve1After) = pair.getReserves();
+            (uint reserve0After, uint reserve1After,) = pair.getReserves();
             uint kAfter = reserve0After * reserve1After;
             assert(lpTokenBalanceBefore < lpTokenBalanceAfter);
             assert(kBefore < kAfter);

@@ -32,4 +32,22 @@ contract EchidnaTest is Setup {
             assert(kBefore < kAfter);
         }
     }
+
+    function testBadSwap(uint amount1, uint amount2) public {
+        if (!completed) {
+            _mintTokens(amount1, amount2);
+        }
+
+        // Pre-conditions:
+        pair.sync();
+        require(pair.balanceOf(address(user)) > 0);
+
+        // Action:
+        (bool success, bytes memory res) = user.proxy(address(pair), abi.encodeWithSelector(pair.swap.selector, amount1, amount2, address(user), ""));
+
+        // Post-condition:
+        assert(!success);
+        string memory _revertMsg = abi.decode(res.slice(4, res.length - 4), (string));
+        assert(_revertMsg == "UniswapV2: INSUFFICIENT_LIQUIDITY");
+    }
 }

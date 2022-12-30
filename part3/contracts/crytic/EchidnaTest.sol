@@ -5,8 +5,8 @@ import "./Setup.sol";
 contract EchidnaTest is Setup {
     function testProvideLiquidity(uint amount1, uint amount2) public {
         // Pre-conditions:
-        amount1 = _between(amount1, pair.MINIMUM_LIQUIDITY, uint(-1));
-        amount2 = _between(amount2, pair.MINIMUM_LIQUIDITY, uint(-1));
+        amount1 = _between(amount1, 1000, uint(-1));
+        amount2 = _between(amount2, 1000, uint(-1));
 
         if (!completed) {
             _mintTokens(amount1, amount2);

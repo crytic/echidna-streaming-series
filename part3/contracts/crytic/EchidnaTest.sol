@@ -10,7 +10,7 @@ contract EchidnaTest is Setup {
         amount2 = _between(amount2, 1000, uint(-1));
 
         if (!completed) {
-            _mintTokens(amount1, amount2);
+            _init(amount1, amount2);
         }
         //// State before
         uint lpTokenBalanceBefore = pair.balanceOf(address(user));
@@ -36,7 +36,7 @@ contract EchidnaTest is Setup {
 
     function testBadSwap(uint amount1, uint amount2) public {
         if (!completed) {
-            _mintTokens(amount1, amount2);
+            _init(amount1, amount2);
         }
 
         // Pre-conditions:
@@ -48,6 +48,15 @@ contract EchidnaTest is Setup {
 
         // Post-condition:
         assert(!success);
+    }
+    
+    function testSwap(uint amount1, uint amount2) public {
+        // Pre-conditions:
+
+        // Action:
+
+        // Post-condition:
+
     }
 
 }

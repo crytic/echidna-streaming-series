@@ -25,6 +25,7 @@ contract Setup {
         factory = new UniswapV2Factory(address(this));
         address testPair = factory.createPair(address(testToken1), address(testToken2));
         pair = UniswapV2Pair(testPair);
+        // Sort the test tokens we just created, for clarity when writing invariant tests later
         (address testTokenA, address testTokenB) = UniswapV2Library.sortTokens(address(testToken1), address(testToken2));
         testToken1 = UniswapV2ERC20(testTokenA);
         testToken2 = UniswapV2ERC20(testTokenB);

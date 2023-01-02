@@ -104,6 +104,7 @@ contract EchidnaTest is Setup {
             amount1In = 0;
             amount0Out = 0;
             amount1Out = UniswapV2Library.getAmountOut(amount0In, reserve0Before, reserve1Before);
+            require(amount1Out > 0);
             emit AmountsIn(amount0In, amount1In);
             emit AmountsOut(amount0Out, amount1Out);
             (bool success1,) = user.proxy(address(testToken1), abi.encodeWithSelector(testToken1.transfer.selector, address(pair), amount0In));
@@ -113,6 +114,7 @@ contract EchidnaTest is Setup {
             amount0In = 0;
             amount1Out = 0;
             amount0Out = UniswapV2Library.getAmountOut(amount1In, reserve1Before, reserve0Before);
+            require(amount0Out > 0);
             emit AmountsIn(amount0In, amount1In);
             emit AmountsOut(amount0Out, amount1Out);
             (bool success1,) = user.proxy(address(testToken2), abi.encodeWithSelector(testToken2.transfer.selector, address(pair), amount1In));

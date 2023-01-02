@@ -3,6 +3,7 @@ pragma solidity ^0.6.0;
 import "../uni-v2/UniswapV2ERC20.sol";
 import "../uni-v2/UniswapV2Pair.sol";
 import "../uni-v2/UniswapV2Factory.sol";
+import "../libraries/UniswapV2Library.sol";
 
 contract Users {
     function proxy(address target, bytes memory data) public returns (bool success, bytes memory retData) {
@@ -23,6 +24,9 @@ contract Setup {
         testToken2 = new UniswapV2ERC20();
         factory = new UniswapV2Factory(address(this));
         pair = UniswapV2Pair(factory.createPair(address(testToken1), address(testToken2)));
+        (address testTokenA, address testTokenB) = UniswapV2Library.sortTokens(address(testToken1), address(testToken2));
+        testToken1 = UniswapV2ERC20(testTokenA);
+        testToken2 = UniswapV2ERC20(testTokenB);
         user = new Users();
     }
 

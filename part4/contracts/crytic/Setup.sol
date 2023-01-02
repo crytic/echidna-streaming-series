@@ -32,8 +32,9 @@ contract Setup {
         address pair = factory.createPair(address(testToken1), address(testToken2));
         testPair = UniswapV2Pair(pair);
         user = new Users();
-        
-
+        (address testTokenA, address testTokenB) = UniswapV2Library.sortTokens(address(testToken1), address(testToken2));
+        testToken1 = UniswapV2ERC20(testTokenA);
+        testToken2 = UniswapV2ERC20(testTokenB);
     }
     
     

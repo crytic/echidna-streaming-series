@@ -132,7 +132,7 @@ contract EchidnaTest is Setup {
         uint kAfter = reserve0After * reserve1After;
         emit ReservesAfter(reserve0After, reserve1After);
         // assert(kBefore == kAfter);
-        assert(kBefore*100/kAfter >= 98 && kBefore*100/kAfter <= 102);
+        assert(kAfter*100/kBefore >= 100 && kAfter*100/kBefore <= 105);
         /* 3. The change in the user's token balances should match our expectations */
         uint balance0After = testToken1.balanceOf(address(user));
         uint balance1After = testToken2.balanceOf(address(user));

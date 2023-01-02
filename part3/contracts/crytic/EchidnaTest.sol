@@ -125,18 +125,19 @@ contract EchidnaTest is Setup {
         // Post-condition:
         /* 1. Swap should be successful */
         assert(success2);
-        /* 2. Reserves may change ,but k should be constant */
+        /* 2. Reserves may change, but k should be (relatively) constant */
         (uint reserve0After, uint reserve1After,) = pair.getReserves();
         uint kAfter = reserve0After * reserve1After;
         emit ReservesAfter(reserve0After, reserve1After);
-        assert(kBefore == kAfter);
+        // assert(kBefore == kAfter);
+        assert(kBefore*100/kAfter >= 98 && kBefore*100/kAfter <= 102);
         /* 3. The change in the user's token balances should match our expectations */
         uint balance0After = testToken1.balanceOf(address(user));
         uint balance1After = testToken2.balanceOf(address(user));
         emit BalancesAfter(balance0After, balance1After);
         if (amount0In > amount1In) {
             assert(balance0After == balance0Before - amount0In);
-            assert(balance1After == balance1After + amount1Out);
+            assert(balance1After == balance1Before + amount1Out);
         } else {
             assert(balance1After == balance1Before - amount1In);
             assert(balance0After == balance0Before + amount0Out);

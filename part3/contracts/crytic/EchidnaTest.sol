@@ -12,7 +12,7 @@ contract EchidnaTest is Setup {
     event ReservesAfter(uint reserve0, uint reserve1);
 
     function testProvideLiquidity(uint amount0, uint amount1) public {
-        // Pre-conditions:
+        // Preconditions:
         amount0 = _between(amount0, 1000, uint(-1));
         amount1 = _between(amount1, 1000, uint(-1));
 
@@ -31,7 +31,7 @@ contract EchidnaTest is Setup {
         // Action:
         (bool success3,) = user.proxy(address(pair), abi.encodeWithSelector(bytes4(keccak256("mint(address)")), address(user)));
 
-        // Post-conditions:
+        // Postconditions:
         if (success3) {
             uint lpTokenBalanceAfter = pair.balanceOf(address(user));
             (uint reserve0After, uint reserve1After,) = pair.getReserves();
@@ -42,23 +42,24 @@ contract EchidnaTest is Setup {
     }
 
     function testBadSwap(uint amount0, uint amount1) public {
+
         if (!completed) {
             _init(amount0, amount1);
         }
 
-        // Pre-conditions:
-        pair.sync();
-        require(pair.balanceOf(address(user)) > 0);
+        // Preconditions:
+        pair.sync(); // we matched the balances with reserves
+        require(pair.balanceOf(address(user)) > 0); //there is liquidity for the swap
 
         // Action:
         (bool success,) = user.proxy(address(pair), abi.encodeWithSelector(pair.swap.selector, amount0, amount1, address(user), ""));
 
         // Post-condition:
-        assert(!success);
+        assert(!success); //call should never succeed
     }
     
     function testSwap(uint amount0, uint amount1) public {
-        // Pre-conditions:
+        // Preconditions:
         if (!completed) {
             _init(amount0, amount1);
         }

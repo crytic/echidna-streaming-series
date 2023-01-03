@@ -12,7 +12,8 @@ contract Users {
 
 contract Setup {
     UniswapV2Factory factory;
-    UniswapV2Pair pair;
+    //UniswapV2Pair pair; //Factory will initialize the pair
+    address testPair;
     UniswapV2ERC20 testToken1;
     UniswapV2ERC20 testToken2;
     Users user;
@@ -22,11 +23,11 @@ contract Setup {
         testToken1 = new UniswapV2ERC20();
         testToken2 = new UniswapV2ERC20();
         factory = new UniswapV2Factory(address(this));
-        address testPair = factory.createPair(address(testToken1), address(testToken2));
-        pair = UniswapV2Pair(testPair);
+        testPair = factory.createPair(address(testToken1), address(testToken2));
+        //pair = UniswapV2Pair(testPair); //Pair constructor does not take arguments, and pair is already initialized
         user = new Users();
-        user.proxy(address(testToken1),abi.encodeWithSelector(testToken1.approve.selector, address(pair),uint(-1)));
-        user.proxy(address(testToken2), abi.encodeWithSelector(testToken2.approve.selector,address(pair),uint(-1)));
+        user.proxy(address(testToken1),abi.encodeWithSelector(testToken1.approve.selector, testPair,uint(-1)));
+        user.proxy(address(testToken2), abi.encodeWithSelector(testToken2.approve.selector,testPair,uint(-1)));
     }
 
     function _init(uint amount1, uint amount2) internal {

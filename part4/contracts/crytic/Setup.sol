@@ -18,7 +18,8 @@ contract Users {
 contract Setup {
     UniswapV2ERC20 testToken1; 
     UniswapV2ERC20 testToken2;
-    UniswapV2Pair testPair;
+    //UniswapV2Pair testPair;  //factory initializes pair
+    address pair;
     UniswapV2Factory factory;
     UniswapV2Router01 router;
     Users user;
@@ -29,8 +30,8 @@ contract Setup {
         testToken2 = new UniswapV2ERC20();
         factory = new UniswapV2Factory(address(this)); //this contract will be the fee setter
         router = new UniswapV2Router01(address(factory),address(0)); // we don't need to test WETH pairs for now
-        address pair = factory.createPair(address(testToken1), address(testToken2));
-        testPair = UniswapV2Pair(pair);
+        pair = factory.createPair(address(testToken1), address(testToken2));
+        //testPair = UniswapV2Pair(pair);  //pair constructor does not take arguments
         user = new Users();
         
 

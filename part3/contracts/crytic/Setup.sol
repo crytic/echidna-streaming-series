@@ -3,6 +3,7 @@ pragma solidity ^0.6.0;
 import "../uni-v2/UniswapV2ERC20.sol";
 import "../uni-v2/UniswapV2Pair.sol";
 import "../uni-v2/UniswapV2Factory.sol";
+import "../libraries/UniswapV2Library.sol";
 
 contract Users {
     function proxy(address target, bytes memory data) public returns (bool success, bytes memory retData) {
@@ -11,19 +12,22 @@ contract Users {
 }
 
 contract Setup {
-    UniswapV2Factory factory;
-    UniswapV2Pair pair;
     UniswapV2ERC20 testToken1;
     UniswapV2ERC20 testToken2;
+    UniswapV2Factory factory;
+    UniswapV2Pair pair;
     Users user;
     bool completed;
-    
+
     constructor() public {
         testToken1 = new UniswapV2ERC20();
         testToken2 = new UniswapV2ERC20();
         factory = new UniswapV2Factory(address(this));
-        address testPair = factory.createPair(address(testToken1), address(testToken2));
-        pair = UniswapV2Pair(testPair);
+        pair = UniswapV2Pair(factory.createPair(address(testToken1), address(testToken2)));
+        // Sort the test tokens we just created, for clarity when writing invariant tests later
+        (address testTokenA, address testTokenB) = UniswapV2Library.sortTokens(address(testToken1), address(testToken2));
+        testToken1 = UniswapV2ERC20(testTokenA);
+        testToken2 = UniswapV2ERC20(testTokenB);
         user = new Users();
         user.proxy(address(testToken1),abi.encodeWithSelector(testToken1.approve.selector, address(pair),uint(-1)));
         user.proxy(address(testToken2), abi.encodeWithSelector(testToken2.approve.selector,address(pair),uint(-1)));
@@ -35,9 +39,7 @@ contract Setup {
         completed = true;
     }
 
-    function _between(uint val, uint low, uint high) internal pure returns(uint) {
-        return low + (val % (high-low +1)); 
+    function _between(uint val, uint low, uint high) internal pure returns (uint) {
+        return low + (val % (high - low + 1));
     }
-
-
 }

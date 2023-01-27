@@ -23,8 +23,7 @@ contract Setup {
         testToken1 = new UniswapV2ERC20();
         testToken2 = new UniswapV2ERC20();
         factory = new UniswapV2Factory(address(this));
-        address testPair = factory.createPair(address(testToken1), address(testToken2));
-        pair = UniswapV2Pair(testPair);
+        pair = UniswapV2Pair(factory.createPair(address(testToken1), address(testToken2)));
         // Sort the test tokens we just created, for clarity when writing invariant tests later
         (address testTokenA, address testTokenB) = UniswapV2Library.sortTokens(address(testToken1), address(testToken2));
         testToken1 = UniswapV2ERC20(testTokenA);
@@ -39,6 +38,7 @@ contract Setup {
         testToken2.mint(address(user), amount2);
         completed = true;
     }
+
 
     function _between(uint val, uint low, uint high) internal pure returns(uint) {
         return low + (val % (high-low +1)); 

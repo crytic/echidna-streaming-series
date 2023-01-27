@@ -16,7 +16,7 @@ contract Setup {
     UniswapV2ERC20 testToken1;
     UniswapV2ERC20 testToken2;
     Users user;
-    bool completed;
+    bool notInitialLiquidityMint;
     
     constructor() public {
         testToken1 = new UniswapV2ERC20();
@@ -32,12 +32,9 @@ contract Setup {
     function _init(uint amount1, uint amount2) internal {
         testToken1.mint(address(user), amount1);
         testToken2.mint(address(user), amount2);
-        completed = true;
     }
 
     function _between(uint val, uint low, uint high) internal pure returns(uint) {
         return low + (val % (high-low +1)); 
     }
-
-
 }

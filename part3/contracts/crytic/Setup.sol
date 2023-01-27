@@ -12,13 +12,13 @@ contract Users {
 }
 
 contract Setup {
-    UniswapV2ERC20 testToken1;
-    UniswapV2ERC20 testToken2;
     UniswapV2Factory factory;
     UniswapV2Pair pair;
+    UniswapV2ERC20 testToken1;
+    UniswapV2ERC20 testToken2;
     Users user;
     bool completed;
-
+    
     constructor() public {
         testToken1 = new UniswapV2ERC20();
         testToken2 = new UniswapV2ERC20();
@@ -39,7 +39,10 @@ contract Setup {
         completed = true;
     }
 
-    function _between(uint val, uint low, uint high) internal pure returns (uint) {
-        return low + (val % (high - low + 1));
+
+    function _between(uint val, uint low, uint high) internal pure returns(uint) {
+        return low + (val % (high-low +1)); 
     }
+
+
 }

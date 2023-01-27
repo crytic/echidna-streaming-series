@@ -6,7 +6,7 @@ Welcome to the 6-part series on how to use Echidna to fuzz like a pro! This repo
 To learn more about how these workshops will work, please read this [blogpost](https://blog.trailofbits.com/2022/11/14/livestream-workshop-fuzzing-echidna-slither/).
 
 
-Note that each workshop will be live streamed on Trail of Bits' [Twitch channel](twitch.tv/trailofbits) and [YouTube channel](https://www.youtube.com/user/trailofbits) at **12 PM EST** on the following days:
+Note that each workshop will be live streamed on Trail of Bits' [Twitch channel](https://www.twitch.tv/trailofbits) and [YouTube channel](https://www.youtube.com/user/trailofbits) at **12 PM EST** on the following days:
 
 ## Beginner
 

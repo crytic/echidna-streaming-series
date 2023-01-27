@@ -35,10 +35,8 @@ contract Setup {
         );
         testPair = UniswapV2Pair(pair);
         user = new Users();
-        (address testTokenA, address testTokenB) = UniswapV2Library.sortTokens(
-            address(testToken1),
-            address(testToken2)
-        );
+        // Sort the test tokens we just created, for clarity when writing invariant tests later
+        (address testTokenA, address testTokenB) = UniswapV2Library.sortTokens(address(testToken1), address(testToken2));
         testToken1 = UniswapV2ERC20(testTokenA);
         testToken2 = UniswapV2ERC20(testTokenB);
     }

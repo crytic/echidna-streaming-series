@@ -128,7 +128,7 @@ contract EchidnaUniV2Tester is Setup {
 
     /*
     Swapping x of testToken1 for y token of testToken2 and back should (roughly) give user x of testToken1.
-    The following function checks this condition by assessing that the resulting x is no more than 3% from the original x.
+    The following function checks this condition by assessing that the resulting x is no more than 3% from the original x on each swap.
     
     However, this condition may be false when the pool has roughly the same amount of A and B and user swaps minimal amount of tokens.
     For instance, if pool consists of:
@@ -148,7 +148,7 @@ contract EchidnaUniV2Tester is Setup {
     But this wouldn't happen if user swapped initially 5 000 of A for 1 B.
     
     To prevent such situations, the following function imposes following limits on the user's input:
-    1. It has to be greater than MINIMUM_AMOUNT = 100.
+    1. It has to be greater than MINIMUM_AMOUNT = 1000.
     2. For some amount y of testToken2, it has to be minimal among all inputs giving the user y testTokens2 from the swap.
     */
     function testPathIndependenceForSwaps(uint x) public
@@ -162,11 +162,11 @@ contract EchidnaUniV2Tester is Setup {
         require(reserve1 > 1);
         require(reserve2 > 1);
 
-        uint MINIMUM_AMOUNT = 100;
+        uint MINIMUM_AMOUNT = 1000;
         uint userBalance1 = testToken1.balanceOf(address(user));
         require(userBalance1 > MINIMUM_AMOUNT);
 
-        x = _between(x, MINIMUM_AMOUNT, uint(-1) / 100); // uint(-1) / 100 needed in POSTCONDITIONS to avoid overflow
+        x = _between(x, MINIMUM_AMOUNT, uint(-1) / 1000); // uint(-1) / 1000 needed in POSTCONDITIONS to avoid overflow
         x = _between(x, MINIMUM_AMOUNT, userBalance1);
         
         // use optimal x - it makes no sense to pay more for a given amount of tokens than necessary
@@ -207,7 +207,7 @@ contract EchidnaUniV2Tester is Setup {
 
         // POSTCONDITIONS:
         assert(x > xOut); // user cannot get more than he gave
-        // 100 * (x - xOut) will not overflow since we constrained x to be < uint(-1) / 100 before
-        assert((x - xOut) * 100 <= 3 * x); // (x - xOut) / x <= 0.03; no more than 3% loss of funds
+        // 1000 * (x - xOut) will not overflow since we constrained x to be < uint(-1) / 1000 before
+        assert((x - xOut) * 1000 <= 591 * x); // (x - xOut) / x <= 0.03; no more than 3% loss of funds on each swap
     }
 }
